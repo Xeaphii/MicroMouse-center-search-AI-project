@@ -10,11 +10,11 @@ forward = [[-1,  0], # go up
 forward_name = ['up', 'left', 'down', 'right']
 
 # action has 3 values: right turn, no turn, left turn
-action = [-1, 0, 1]
+action = [1, 0, -1]
 action_name = ['R', '#', 'L']
 
 dir_names   = ['up', 'left', 'down', 'right']
-angle_val = [-90, 0, 90]
+angle_val = [-90, 0,90]
 class Robot(object):
     def __init__(self, maze_dim):
         '''Use the initialization function to set up attributes that your robot
@@ -31,7 +31,7 @@ class Robot(object):
         self.count_grid = [[0 for row in range(self.no_of_rows)] 
                   for col in range(self.no_of_cols)]
         x,y = self.location
-        self.count_grid[x][y] = 1
+        #self.count_grid[x][y] = 1
 
 
     def isGoal(self, location):
@@ -53,9 +53,11 @@ class Robot(object):
         self.location  = [ self.location[i]+delta[i]*distance for i in range(2) ]
         #return    (direction, location)
 
-    def print_list(input_list):
+    def print_list(self,input_list):
         for inner_list in input_list:
             print inner_list,'\n'
+        print '\n \n'
+
     def next_move(self, sensors):
         '''
         Use this function to determine the next move the robot should make,
@@ -77,7 +79,7 @@ class Robot(object):
         the maze) then returing the tuple ('Reset', 'Reset') will indicate to
         the tester to end the run and return the robot to the start.
         '''
-        time.sleep(0.5)
+        time.sleep(2.5)
         sensors_array = np.array(sensors)
         #looks for possible indexes for taking random turn
         sensors_array = np.where(sensors_array>0)
@@ -104,10 +106,16 @@ class Robot(object):
         #Updating location count     
         x,y = self.location
         self.count_grid[x][y]  += 1
-
+        
+        #Update robot location
         self.move(rotation, movement)
-        #print 'rotation ',rotation,' movement ', movement
-        #print 'heading ',self.heading,' location ', self.location
+
+        print 'sensors',sensors
+        print 'rotation ',rotation,' movement ', movement
+        print 'heading ',self.heading,' location ', self.location
+        self.print_list(self.count_grid)
+
+
         return rotation, movement
 
 
