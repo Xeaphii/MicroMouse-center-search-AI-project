@@ -69,18 +69,27 @@ class Robot(object):
         the maze) then returing the tuple ('Reset', 'Reset') will indicate to
         the tester to end the run and return the robot to the start.
         '''
-        print sensors
         time.sleep(0.2)
         sensors_array = np.array(sensors)
         #looks for possible indexes for taking random turn
-        sensors_array = np.where(sensors_array)
-        #Assigns random value to the turn for initial exploration
-        rand_index = random.choice(sensors_array)
-        print(sensors_array,' Selected value',rand_index,'angle value',angle_val[rand_index])
+        sensors_array = np.where(sensors_array>0)
 
-        rotation = angle_val[rand_index]
-        movement = 1
+        sensors_array = sensors_array[0]  #for getting first element that is size of that array
+
+        if len(sensors_array) >0:
+
+            #Assigns random value to the turn for initial exploration
+            rand_index = random.choice(sensors_array)
+
+            rotation = angle_val[rand_index]
+            movement = 1
+        else:
+            #if that was the dead end case
+
+            rotation = 0
+            movement = 1
         #print self.isGoal(self.location)
+        print 'rotation ',rotation,' movement ', movement
         return rotation, movement
 
 
