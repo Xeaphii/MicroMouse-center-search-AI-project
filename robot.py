@@ -57,7 +57,33 @@ class Robot(object):
         '''
         print sensors
         time.sleep(0.2)
+        sensors_array = np.array(sensors)
+        #looks for possible indexes for taking random turn
+        sensors_array = np.where(sensors_array)
+
         rotation = 1
         movement = 1
         #print self.isGoal(self.location)
         return rotation, movement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
