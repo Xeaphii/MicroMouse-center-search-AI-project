@@ -86,7 +86,7 @@ class Robot(object):
         else:
             #if that was the dead end case
 
-            rotation = 0
+            rotation = 90
             movement = 1
         #print self.isGoal(self.location)
         print 'rotation ',rotation,' movement ', movement
