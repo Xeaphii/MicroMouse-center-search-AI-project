@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import random
 
 forward = [[-1,  0], # go up
            [ 0, -1], # go left
@@ -12,7 +13,7 @@ action = [-1, 0, 1]
 action_name = ['R', '#', 'L']
 
 dir_names   = ['up', 'left', 'down', 'right']
-
+angle_val = [-90, 0, 90]
 class Robot(object):
     def __init__(self, maze_dim):
         '''Use the initialization function to set up attributes that your robot
@@ -33,6 +34,19 @@ class Robot(object):
                 and row_no <= (self.no_of_rows/2) and \
                (self.no_of_cols/2-1) <= col_no \
                and col_no <= (self.no_of_cols/2)
+
+    def move(self, steering, distance):
+
+        # make a new copy
+        curr_pos  = dir_names.index(self.heading)
+        act_index = action_name.index(steering)
+        dir_index = (curr_pos+action[act_index])%len(dir_names)
+        direction = dir_names[dir_index]
+
+        delta     = forward[dir_index] 
+        location  = [ self.location[i]+delta[i]*distance for i in range(2) ]
+        return    (direction, location)
+
 
     def next_move(self, sensors):
         '''
@@ -60,8 +74,11 @@ class Robot(object):
         sensors_array = np.array(sensors)
         #looks for possible indexes for taking random turn
         sensors_array = np.where(sensors_array)
+        #Assigns random value to the turn for initial exploration
+        rand_index = random.choice(sensors_array)
+        print(sensors_array,' Selected value',rand_index,'angle value',angle_val[rand_index])
 
-        rotation = 1
+        rotation = angle_val[rand_index]
         movement = 1
         #print self.isGoal(self.location)
         return rotation, movement
