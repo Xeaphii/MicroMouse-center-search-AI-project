@@ -23,11 +23,15 @@ class Robot(object):
         the robot is placed in.'''
         
 
-        self.heading = 'up'
-        self.maze_dim = maze_dim
+        self.heading    = 'up'
+        self.maze_dim   = maze_dim
         self.no_of_rows = maze_dim
         self.no_of_cols = maze_dim
-        self.location = [self.no_of_rows-1, 0]
+        self.location   = [self.no_of_rows-1, 0]
+        self.count_grid = [[0 for row in range(self.no_of_rows)] 
+                  for col in range(self.no_of_cols)]
+        x,y = self.location
+        self.count_grid[x][y] = 1
 
 
     def isGoal(self, location):
@@ -49,7 +53,9 @@ class Robot(object):
         self.location  = [ self.location[i]+delta[i]*distance for i in range(2) ]
         #return    (direction, location)
 
-
+    def print_list(input_list):
+        for inner_list in input_list:
+            print inner_list,'\n'
     def next_move(self, sensors):
         '''
         Use this function to determine the next move the robot should make,
@@ -94,9 +100,14 @@ class Robot(object):
         if self.isGoal(self.location):
             print 'Reached Goal'
             sys.exit()
+
+        #Updating location count     
+        x,y = self.location
+        self.count_grid[x][y]  += 1
+
         self.move(rotation, movement)
-        print 'rotation ',rotation,' movement ', movement
-        print 'heading ',self.heading,' location ', self.location
+        #print 'rotation ',rotation,' movement ', movement
+        #print 'heading ',self.heading,' location ', self.location
         return rotation, movement
 
 
