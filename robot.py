@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import random
+import sys
 
 forward = [[-1,  0], # go up
            [ 0, -1], # go left
@@ -22,11 +23,12 @@ class Robot(object):
         the robot is placed in.'''
         
 
-        self.location = [0, 0]
         self.heading = 'up'
         self.maze_dim = maze_dim
         self.no_of_rows = maze_dim
         self.no_of_cols = maze_dim
+        self.location = [self.no_of_rows-1, 0]
+
 
     def isGoal(self, location):
         row_no, col_no = location
@@ -39,13 +41,13 @@ class Robot(object):
 
         # make a new copy
         curr_pos  = dir_names.index(self.heading)
-        act_index = action_name.index(steering)
+        act_index = angle_val.index(steering)
         dir_index = (curr_pos+action[act_index])%len(dir_names)
-        direction = dir_names[dir_index]
+        self.heading = dir_names[dir_index]
 
         delta     = forward[dir_index] 
-        location  = [ self.location[i]+delta[i]*distance for i in range(2) ]
-        return    (direction, location)
+        self.location  = [ self.location[i]+delta[i]*distance for i in range(2) ]
+        #return    (direction, location)
 
 
     def next_move(self, sensors):
@@ -69,7 +71,7 @@ class Robot(object):
         the maze) then returing the tuple ('Reset', 'Reset') will indicate to
         the tester to end the run and return the robot to the start.
         '''
-        time.sleep(0.2)
+        time.sleep(0.5)
         sensors_array = np.array(sensors)
         #looks for possible indexes for taking random turn
         sensors_array = np.where(sensors_array>0)
@@ -89,7 +91,12 @@ class Robot(object):
             rotation = 90
             movement = 1
         #print self.isGoal(self.location)
+        if self.isGoal(self.location):
+            print 'Reached Goal'
+            sys.exit()
+        self.move(rotation, movement)
         print 'rotation ',rotation,' movement ', movement
+        print 'heading ',self.heading,' location ', self.location
         return rotation, movement
 
 
