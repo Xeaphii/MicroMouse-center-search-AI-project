@@ -44,6 +44,7 @@ class Robot(object):
         x,y = self.location
         #self.count_grid[x][y] = 1
         self.is_previous_loc_deadend = False
+        self.self_exploration_val    = 1000000.
 
 
     def isGoal(self, location):
@@ -52,6 +53,13 @@ class Robot(object):
                 and row_no <= (self.no_of_rows/2) and \
                (self.no_of_cols/2-1) <= col_no \
                and col_no <= (self.no_of_cols/2)
+
+    def is_all_space_explored(self):
+        for i in range(len(self.count_grid)):
+            for j in range(len(self.count_grid[0])):
+                if self.count_grid[i][j] ==0:
+                    return False
+        return True
 
     def move(self, steering, distance):
 
@@ -79,6 +87,7 @@ class Robot(object):
         #Updating location count     
         x,y = self.location
         self.deadend_grid[x][y]  += 1
+
     def update_mapping(self,value):
         #Updating location count     
         # - up = 1 = 2^0 = 2^Direction.N.value 
@@ -159,9 +168,9 @@ class Robot(object):
                 x,y = self.simulate_move(angle_val[sensors_item],1)
 
                 if self.count_grid[x][y] == 0:
-                    sensor_weight = 1.
+                    sensor_weight = self.self_exploration_val 
                 else:
-                    sensor_weight = 1./float(self.count_grid[x][y])
+                    sensor_weight = self.self_exploration_val **(1./float(self.count_grid[x][y]))
 
                 weighted_array.append((sensors_item,sensor_weight))
             #For more space exploration, 
@@ -181,8 +190,8 @@ class Robot(object):
         self.update_mapping(value) #Updates value for mapping
 
         #print self.isGoal(self.location)
-        if self.isGoal(self.location):
-            print 'Reached Goal'
+        if self.is_all_space_explored():
+            print 'All Space explored, ready for optimization'
             sys.exit()
         
         #Update robot location
