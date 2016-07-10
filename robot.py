@@ -16,6 +16,8 @@ action_name = ['L', '#', 'R']
 
 dir_names   = ['up', 'left', 'down', 'right']
 angle_val = [-90, 0,90]
+
+dir_index_ar = [0,3,2,1] # for up right down left wall orientation
 class Robot(object):
     def __init__(self, maze_dim):
         '''Use the initialization function to set up attributes that your robot
@@ -101,13 +103,23 @@ class Robot(object):
         delta     = forward[dir_index] 
         return [ self.location[i]+delta[i]*distance for i in range(2) ]
 
+    def get_corrected_orientation(self, steering):
+
+        # make a new copy
+        curr_pos  = dir_names.index(self.heading)
+        act_index = steering
+        dir_index = (curr_pos+action[act_index])%len(dir_names)
+        return dir_index_ar[dir_index]
+
 
     def robot_exploration(self,sensors):
 
         #For updating mapping of space start
-        for sensor_reading in sensors:
+        value = 0
+        for idx,sensor_reading in enumerate(sensors):
             if sensor_reading>0:
-                value += 2**1
+                value += 2**self.get_corrected_orientation(idx)
+        self.update_mapping(value)
         #For updating mapping of space end
 
         #time.sleep(0.1)
@@ -135,7 +147,6 @@ class Robot(object):
 
                 weighted_array.append((sensors_item,sensor_weight))
             #For more space exploration, 
-            print weighted_array
             rand_index = self.weighted_choice(weighted_array)
 
             rotation = angle_val[rand_index]
@@ -182,7 +193,7 @@ class Robot(object):
         
         rotation, movement = self.robot_exploration(sensors)
 
-        self.print_list(self.count_grid)
+        self.print_list(self.mapped_grid)
 
 
         return rotation, movement
