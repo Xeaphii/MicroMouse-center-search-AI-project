@@ -24,14 +24,20 @@ class Robot(object):
         the robot is placed in.'''
         
 
-        self.heading    = 'up'
-        self.maze_dim   = maze_dim
-        self.no_of_rows = maze_dim
-        self.no_of_cols = maze_dim
-        self.location   = [self.no_of_rows-1, 0]
-        self.count_grid = [[0 for row in range(self.no_of_rows)] 
+        self.heading     = 'up'
+        self.maze_dim    = maze_dim
+        self.no_of_rows  = maze_dim
+        self.no_of_cols  = maze_dim
+        self.init_val    = 0
+        self.location    = [self.no_of_rows-1, 0]
+        self.count_grid  = [[0 for row in range(self.no_of_rows)] 
                   for col in range(self.no_of_cols)]
+
+        self.mapped_grid = [[self.init_val for row in range(self.no_of_rows)] 
+                  for col in range(self.no_of_cols)]
+
         x,y = self.location
+        self.prev_sensors = [0,0,0]
         #self.count_grid[x][y] = 1
 
 
@@ -64,6 +70,16 @@ class Robot(object):
         x,y = self.location
         self.count_grid[x][y]  += 1
 
+    def update_mapping(self,value):
+        #Updating location count     
+        # - North = 1 = 2^0 = 2^Direction.N.value 
+        # - East  = 2 = 2^1 = 2^Direction.E.value
+        # - South = 3 = 2^2 = 2^Direction.S.value
+        # - West  = 4 = 2^3 = 2^Direction.W.value
+
+        x,y = self.location
+        self.mapped_grid[x][y] = value
+
     def weighted_choice(self,choices):
         values, weights = zip(*choices)
         total = 0
@@ -87,6 +103,13 @@ class Robot(object):
 
 
     def robot_exploration(self,sensors):
+
+        #For updating mapping of space start
+        for sensor_reading in sensors:
+            if sensor_reading>0:
+                value += 2**1
+        #For updating mapping of space end
+
         #time.sleep(0.1)
         sensors_array = np.array(sensors)
         
@@ -131,6 +154,8 @@ class Robot(object):
         #Update robot location
         self.move(rotation, movement)
 
+        self.prev_sensors = sensors     #For keeping track of previous sensor value for back wall
+        
         return rotation, movement
 
     def next_move(self, sensors):
