@@ -215,7 +215,15 @@ class Robot(object):
 
             self.print_list(self.count_grid)
             print 'Total steps takes ',self.count_steps
-            
+
+            #Now moving for second run
+            time.sleep(3.0)
+
+            self.build_heuristics()
+
+            print 'Now printing heuristics'
+            self.print_list(self.heuristics)
+
             sys.exit()
         
         #Update robot location
@@ -254,14 +262,14 @@ class Robot(object):
                 self.update_heuristics(location, h_value)
 
         while(len(stacked_positions) >0):
-            location , h_value = stacked_positions[0]
-            del stacked_positions[0]
+            location , h_value = stacked_positions.pop(0)
 
             allowed_actions_list = self.allowed_actions(location)
-
+            
             for idx in allowed_actions_list:
                 updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
-                if self.heuristics[x][y] != self.def_heu_val:
+                
+                if self.heuristics[updated_loc[0]][updated_loc[1]] == self.def_heu_val:
                     stacked_positions.append((updated_loc,h_value+1))
                     self.update_heuristics(updated_loc, h_value+1)
 
