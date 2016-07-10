@@ -87,6 +87,11 @@ class Robot(object):
 
         sensors_array = sensors_array[0]  #for getting first element that is size of that array
 
+        print 'location ',self.location
+        #Updating location count     
+        x,y = self.location
+        self.count_grid[x][y]  += 1
+
         if len(sensors_array) >0:
 
             #Assigns random value to the turn for initial exploration
@@ -95,24 +100,27 @@ class Robot(object):
             rotation = angle_val[rand_index]
             print 'sensors ',sensors,' sensor array ',sensors_array,' Chosen value ' ,rand_index,' rotation',rotation,' heading',self.heading
             movement = 1
+            #Update robot location
+            self.move(rotation, movement)
+            print 'After updaitng moves location ',self.location
         else:
             #if that was the dead end case
 
             rotation = 90
             movement = 1
+
+            #Update robot location
+            self.move(rotation, 0)
+            print 'After updaitng moves location ',self.location
+
         #print self.isGoal(self.location)
         if self.isGoal(self.location):
             print 'Reached Goal'
             sys.exit()
 
-        print 'location ',self.location
-        #Updating location count     
-        x,y = self.location
-        self.count_grid[x][y]  += 1
         
-        #Update robot location
-        self.move(rotation, movement)
-        print 'After updaitng moves location ',self.location
+        
+        
         self.print_list(self.count_grid)
 
 
