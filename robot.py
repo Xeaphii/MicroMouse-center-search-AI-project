@@ -1,7 +1,8 @@
 import numpy as np
 import time
-import random
 import sys
+from random import random
+from bisect import bisect
 
 forward = [[-1,  0], # go up
            [ 0, -1], # go left
@@ -63,6 +64,28 @@ class Robot(object):
         x,y = self.location
         self.count_grid[x][y]  += 1
 
+    def weighted_choice(self,choices):
+        values, weights = zip(*choices)
+        total = 0
+        cum_weights = []
+        for w in weights:
+            total += w
+            cum_weights.append(total)
+        x = random() * total
+        i = bisect(cum_weights, x)
+        return values[i]
+
+    def simulate_move(self, steering, distance):
+
+        # make a new copy
+        curr_pos  = dir_names.index(self.heading)
+        act_index = angle_val.index(steering)
+        dir_index = (curr_pos+action[act_index])%len(dir_names)
+
+        delta     = forward[dir_index] 
+        return [ self.location[i]+delta[i]*distance for i in range(2) ]
+
+
     def robot_exploration(self,sensors):
         #time.sleep(0.1)
         sensors_array = np.array(sensors)
@@ -76,7 +99,22 @@ class Robot(object):
         if len(sensors_array) >0:
 
             #Assigns random value to the turn for initial exploration
-            rand_index = random.choice(sensors_array)
+            #rand_index = random.choice(sensors_array)
+
+            weighted_array = []
+            for sensors_item in sensors_array:
+                x,y = self.simulate_move(angle_val[sensors_item],1)
+
+                if self.count_grid[x][y] == 0:
+                    sensor_weight = 1.
+                else:
+                    sensor_weight = 1./float(self.count_grid[x][y])
+
+                weighted_array.append((sensors_item,sensor_weight))
+            #For more space exploration, 
+            print weighted_array
+            rand_index = self.weighted_choice(weighted_array)
+
             rotation = angle_val[rand_index]
             movement = 1
             
