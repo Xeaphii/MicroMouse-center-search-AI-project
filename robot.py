@@ -58,6 +58,43 @@ class Robot(object):
             print inner_list,'\n'
         print '\n \n'
 
+    def update_counter(self):
+        #Updating location count     
+        x,y = self.location
+        self.count_grid[x][y]  += 1
+
+    def robot_exploration(self,sensors):
+        #time.sleep(0.1)
+        sensors_array = np.array(sensors)
+        
+        #looks for possible indexes for taking random turn
+        sensors_array = np.where(sensors_array>0)
+
+        sensors_array = sensors_array[0]  #for getting first element that is size of that array
+        self.update_counter()        
+
+        if len(sensors_array) >0:
+
+            #Assigns random value to the turn for initial exploration
+            rand_index = random.choice(sensors_array)
+            rotation = angle_val[rand_index]
+            movement = 1
+            
+        else:
+            #if that was the dead end case
+            rotation = 90
+            movement = 0
+
+        #print self.isGoal(self.location)
+        if self.isGoal(self.location):
+            print 'Reached Goal'
+            sys.exit()
+
+        #Update robot location
+        self.move(rotation, movement)
+
+        return rotation, movement
+
     def next_move(self, sensors):
         '''
         Use this function to determine the next move the robot should make,
@@ -79,43 +116,9 @@ class Robot(object):
         the maze) then returing the tuple ('Reset', 'Reset') will indicate to
         the tester to end the run and return the robot to the start.
         '''
-        #time.sleep(0.1)
-        sensors_array = np.array(sensors)
         
-        #looks for possible indexes for taking random turn
-        sensors_array = np.where(sensors_array>0)
+        rotation, movement = self.robot_exploration(sensors)
 
-        sensors_array = sensors_array[0]  #for getting first element that is size of that array
-
-        print 'location ',self.location
-        #Updating location count     
-        x,y = self.location
-        self.count_grid[x][y]  += 1
-
-        if len(sensors_array) >0:
-
-            #Assigns random value to the turn for initial exploration
-            rand_index = random.choice(sensors_array)
-
-            rotation = angle_val[rand_index]
-            print 'sensors ',sensors,' sensor array ',sensors_array,' Chosen value ' ,rand_index,' rotation',rotation,' heading',self.heading
-            movement = 1
-            
-        else:
-            #if that was the dead end case
-
-            rotation = 90
-            movement = 0
-
-        #print self.isGoal(self.location)
-        if self.isGoal(self.location):
-            print 'Reached Goal'
-            sys.exit()
-
-        #Update robot location
-        self.move(rotation, movement)
-        print 'After updaitng moves location ',self.location
-        
         self.print_list(self.count_grid)
 
 
