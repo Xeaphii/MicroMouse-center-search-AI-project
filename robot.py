@@ -31,16 +31,19 @@ class Robot(object):
         self.no_of_rows  = maze_dim
         self.no_of_cols  = maze_dim
         self.init_val    = 0
-        self.location    = [self.no_of_rows-1, 0]
+        self.init_loc    = [self.no_of_rows-1, 0]
+        self.location    = self.init_loc 
         self.count_grid  = [[0 for row in range(self.no_of_rows)] 
                   for col in range(self.no_of_cols)]
 
         self.mapped_grid = [[self.init_val for row in range(self.no_of_rows)] 
                   for col in range(self.no_of_cols)]
 
+        self.deadend_grid = [[0 for row in range(self.no_of_rows)] 
+                  for col in range(self.no_of_cols)]
         x,y = self.location
-        self.prev_sensors = [0,0,0]
         #self.count_grid[x][y] = 1
+        self.is_previous_loc_deadend = False
 
 
     def isGoal(self, location):
@@ -72,6 +75,10 @@ class Robot(object):
         x,y = self.location
         self.count_grid[x][y]  += 1
 
+    def update_deadends(self):
+        #Updating location count     
+        x,y = self.location
+        self.deadend_grid[x][y]  += 1
     def update_mapping(self,value):
         #Updating location count     
         # - up = 1 = 2^0 = 2^Direction.N.value 
@@ -140,6 +147,10 @@ class Robot(object):
 
         if len(sensors_array) >0:
 
+            if self.init_loc != self.location and\
+                 self.is_previous_loc_deadend == False: #Cheque for initial location
+                value += 2**back_index[0]   #Value for the back index
+
             #Assigns random value to the turn for initial exploration
             #rand_index = random.choice(sensors_array)
 
@@ -159,12 +170,13 @@ class Robot(object):
             rotation = angle_val[rand_index]
             movement = 1
 
-            value += 2**back_index[0]   #Value for the back index
+            self.is_previous_loc_deadend = False
         else:
             #if that was the dead end case
             rotation = 90
             movement = 0
-
+            self.update_deadends()
+            self.is_previous_loc_deadend = True
 
         self.update_mapping(value) #Updates value for mapping
 
@@ -173,16 +185,8 @@ class Robot(object):
             print 'Reached Goal'
             sys.exit()
         
-        #For doing back wall detection respective to the robot
-        
-        #if  len(sensors_array) >0 and rotation != 0:
-        #    if (rand_index == 2 and self.prev_sensors[0] == 0) \
-        #        or (rand_index == 1 and self.prev_sensors[2] == 0):
-        #        value += 2**self.get_corrected_orientation(idx)
         #Update robot location
         self.move(rotation, movement)
-
-        self.prev_sensors = sensors     #For keeping track of previous sensor value for back wall
         
         return rotation, movement
 
