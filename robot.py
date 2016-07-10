@@ -74,10 +74,10 @@ class Robot(object):
 
     def update_mapping(self,value):
         #Updating location count     
-        # - North = 1 = 2^0 = 2^Direction.N.value 
-        # - East  = 2 = 2^1 = 2^Direction.E.value
-        # - South = 3 = 2^2 = 2^Direction.S.value
-        # - West  = 4 = 2^3 = 2^Direction.W.value
+        # - up = 1 = 2^0 = 2^Direction.N.value 
+        # - right  = 2 = 2^1 = 2^Direction.E.value
+        # - down = 3 = 2^2 = 2^Direction.S.value
+        # - left  = 4 = 2^3 = 2^Direction.W.value
 
         x,y = self.location
         self.mapped_grid[x][y] = value
@@ -115,11 +115,18 @@ class Robot(object):
     def robot_exploration(self,sensors):
 
         #For updating mapping of space start
+        back_index = [0,1,2,3]
         value = 0
         for idx,sensor_reading in enumerate(sensors):
+            cor_index = self.get_corrected_orientation(idx)
+            back_index.remove(cor_index)
             if sensor_reading>0:
-                value += 2**self.get_corrected_orientation(idx)
-        self.update_mapping(value)
+                value += 2**cor_index
+
+               
+        
+
+
         #For updating mapping of space end
 
         #time.sleep(0.1)
@@ -151,17 +158,27 @@ class Robot(object):
 
             rotation = angle_val[rand_index]
             movement = 1
-            
+
+            value += 2**back_index[0]   #Value for the back index
         else:
             #if that was the dead end case
             rotation = 90
             movement = 0
 
+
+        self.update_mapping(value) #Updates value for mapping
+
         #print self.isGoal(self.location)
         if self.isGoal(self.location):
             print 'Reached Goal'
             sys.exit()
-
+        
+        #For doing back wall detection respective to the robot
+        
+        #if  len(sensors_array) >0 and rotation != 0:
+        #    if (rand_index == 2 and self.prev_sensors[0] == 0) \
+        #        or (rand_index == 1 and self.prev_sensors[2] == 0):
+        #        value += 2**self.get_corrected_orientation(idx)
         #Update robot location
         self.move(rotation, movement)
 
