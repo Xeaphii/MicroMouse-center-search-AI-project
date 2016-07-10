@@ -100,26 +100,21 @@ class Robot(object):
             rotation = angle_val[rand_index]
             print 'sensors ',sensors,' sensor array ',sensors_array,' Chosen value ' ,rand_index,' rotation',rotation,' heading',self.heading
             movement = 1
-            #Update robot location
-            self.move(rotation, movement)
-            print 'After updaitng moves location ',self.location
+            
         else:
             #if that was the dead end case
 
             rotation = 90
-            movement = 1
-
-            #Update robot location
-            self.move(rotation, 0)
-            print 'After updaitng moves location ',self.location
+            movement = 0
 
         #print self.isGoal(self.location)
         if self.isGoal(self.location):
             print 'Reached Goal'
             sys.exit()
 
-        
-        
+        #Update robot location
+        self.move(rotation, movement)
+        print 'After updaitng moves location ',self.location
         
         self.print_list(self.count_grid)
 
