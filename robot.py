@@ -217,12 +217,15 @@ class Robot(object):
             print 'Total steps takes ',self.count_steps
 
             #Now moving for second run
-            time.sleep(3.0)
+            time.sleep(0.5)
 
             self.build_heuristics()
 
             print 'Now printing heuristics'
             self.print_list(self.heuristics)
+
+            print 'Now performing a star search'
+            self.print_list(self.a_star_search())
 
             sys.exit()
         
@@ -249,6 +252,8 @@ class Robot(object):
 
         return possible_indexes
 
+
+    #For building heuristics function from mapped maze
     def build_heuristics(self):
 
         #For all of the currently opened maze positions
@@ -265,13 +270,67 @@ class Robot(object):
             location , h_value = stacked_positions.pop(0)
 
             allowed_actions_list = self.allowed_actions(location)
-            
+
             for idx in allowed_actions_list:
                 updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
                 
                 if self.heuristics[updated_loc[0]][updated_loc[1]] == self.def_heu_val:
                     stacked_positions.append((updated_loc,h_value+1))
                     self.update_heuristics(updated_loc, h_value+1)
+
+
+    #Searching using A star method for optimal path from start to end
+    def a_star_search(self):
+
+        closed = [[0 for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
+        closed[self.init_loc[0]][self.init_loc[1]] = 1
+
+        action = [[-1 for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
+
+        x,y = self.init_loc
+        g = 0
+        h = self.heuristics[x][y]
+        open = [[g+h,g, x, y]]
+
+        found = False  # flag that is set when search is complete
+        resign = False
+        count = 0
+        
+        while not found and not resign:
+            if len(open) == 0:
+                resign = True
+                return "Fail"
+            else:
+                open.sort()
+                open.reverse()
+                next = open.pop()
+                x = next[2]
+                y = next[3]
+                location = (x,y)
+                g = next[0]
+                count += 1
+                
+                if self.isGoal((x,y)):
+                    found = True
+                else:
+                    allowed_actions_list = self.allowed_actions((x,y))
+                    for idx in allowed_actions_list:
+                        updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
+                        
+                        if closed[updated_loc[0]][updated_loc[1]] == 0:
+                            min_action_value = float('Inf')
+                            
+                            g2 = 0
+                            if g2+self.heuristics[updated_loc[0]][updated_loc[1]] < min_action_value:
+                                min_action_value = g2+self.heuristics[updated_loc[0]][updated_loc[1]]
+                                min_x2 ,min_y2  = updated_loc
+                                action[updated_loc[0]][updated_loc[1]] = idx
+                                
+                    g2 = g + 1
+                    open.append([g2+min_action_value,g2, min_x2, min_y2])
+                    closed[min_x2][min_y2] = 1
+
+        return action
 
 
     def next_move(self, sensors):
