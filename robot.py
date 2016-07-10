@@ -31,8 +31,10 @@ class Robot(object):
         self.no_of_rows  = maze_dim
         self.no_of_cols  = maze_dim
         self.init_val    = 0
+        self.def_heu_val = -1
         self.init_loc    = [self.no_of_rows-1, 0]
         self.location    = self.init_loc 
+
         self.count_grid  = [[0 for row in range(self.no_of_rows)] 
                   for col in range(self.no_of_cols)]
 
@@ -41,12 +43,22 @@ class Robot(object):
 
         self.deadend_grid = [[0 for row in range(self.no_of_rows)] 
                   for col in range(self.no_of_cols)]
+
+        self.heuristics = [[self.def_heu_val for row in range(self.no_of_rows)]
+                 for col in range(self.no_of_cols)]
+
         x,y = self.location
         #self.count_grid[x][y] = 1
         self.is_previous_loc_deadend = False
-        self.self_exploration_val    = 1000000.
+        self.self_exploration_val    = 10.
+        self.epsilon_val = 0.0000001
+        self.count_steps = 0
+        self.size_of_goal= 2
+        self.no_of_dim   = 2
 
 
+    def test_coverage():
+        return 
     def isGoal(self, location):
         row_no, col_no = location
         return (self.no_of_rows/2-1) <= row_no \
@@ -87,6 +99,11 @@ class Robot(object):
         #Updating location count     
         x,y = self.location
         self.deadend_grid[x][y]  += 1
+
+    def update_heuristics(self,location,h_value):
+        #Updating location count     
+        x,y = location
+        self.heuristics[x][y] = h_value
 
     def update_mapping(self,value):
         #Updating location count     
@@ -170,7 +187,10 @@ class Robot(object):
                 if self.count_grid[x][y] == 0:
                     sensor_weight = self.self_exploration_val 
                 else:
-                    sensor_weight = self.self_exploration_val **(1./float(self.count_grid[x][y]))
+                    if self.deadend_grid[x][y] == 1:
+                        sensor_weight = self.epsilon_val
+                    else:
+                        sensor_weight = self.self_exploration_val **(-self.count_grid[x][y])
 
                 weighted_array.append((sensors_item,sensor_weight))
             #For more space exploration, 
@@ -192,12 +212,59 @@ class Robot(object):
         #print self.isGoal(self.location)
         if self.is_all_space_explored():
             print 'All Space explored, ready for optimization'
+
+            self.print_list(self.count_grid)
+            print 'Total steps takes ',self.count_steps
+            
             sys.exit()
         
         #Update robot location
         self.move(rotation, movement)
         
         return rotation, movement
+
+    #Allowed actions for any mapped location of maze
+    def allowed_actions(self,location):
+        allowed_actions_list = []
+        x,y = location
+
+        #convert location to binary and then to list of integers
+        allowed_actions_list = map(int,list('{0:04b}'.format(self.mapped_grid[x][y])))
+        allowed_actions_list.reverse()
+
+        #up right down left wall orientation
+
+        possible_indexes = []
+        for idx,action in enumerate(allowed_actions_list):
+            if action == 1:
+                possible_indexes.append(idx)
+
+        return possible_indexes
+
+    def build_heuristics(self):
+
+        #For all of the currently opened maze positions
+        stacked_positions = []
+
+        for x in range(self.size_of_goal):
+            for y in range(self.size_of_goal):
+                location = (self.no_of_rows/2+x-1, self.no_of_cols/2+y-1)
+                h_value = 0
+                stacked_positions.append((location,h_value))
+                self.update_heuristics(location, h_value)
+
+        while(len(stacked_positions) >0):
+            location , h_value = stacked_positions[0]
+            del stacked_positions[0]
+
+            allowed_actions_list = self.allowed_actions(location)
+
+            for idx in allowed_actions_list:
+                updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
+                if self.heuristics[x][y] != self.def_heu_val:
+                    stacked_positions.append((updated_loc,h_value+1))
+                    self.update_heuristics(updated_loc, h_value+1)
+
 
     def next_move(self, sensors):
         '''
@@ -220,32 +287,7 @@ class Robot(object):
         the maze) then returing the tuple ('Reset', 'Reset') will indicate to
         the tester to end the run and return the robot to the start.
         '''
-        
+        self.count_steps +=1
         rotation, movement = self.robot_exploration(sensors)
 
-        self.print_list(self.mapped_grid)
-
-
         return rotation, movement
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
