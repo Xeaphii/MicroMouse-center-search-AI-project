@@ -11,7 +11,7 @@ forward_name = ['up', 'left', 'down', 'right']
 
 # action has 3 values: right turn, no turn, left turn
 action = [1, 0, -1]
-action_name = ['R', '#', 'L']
+action_name = ['L', '#', 'R']
 
 dir_names   = ['up', 'left', 'down', 'right']
 angle_val = [-90, 0,90]
@@ -79,8 +79,9 @@ class Robot(object):
         the maze) then returing the tuple ('Reset', 'Reset') will indicate to
         the tester to end the run and return the robot to the start.
         '''
-        time.sleep(2.5)
+        #time.sleep(0.1)
         sensors_array = np.array(sensors)
+        
         #looks for possible indexes for taking random turn
         sensors_array = np.where(sensors_array>0)
 
@@ -92,6 +93,7 @@ class Robot(object):
             rand_index = random.choice(sensors_array)
 
             rotation = angle_val[rand_index]
+            print 'sensors ',sensors,' sensor array ',sensors_array,' Chosen value ' ,rand_index,' rotation',rotation,' heading',self.heading
             movement = 1
         else:
             #if that was the dead end case
@@ -103,16 +105,14 @@ class Robot(object):
             print 'Reached Goal'
             sys.exit()
 
+        print 'location ',self.location
         #Updating location count     
         x,y = self.location
         self.count_grid[x][y]  += 1
         
         #Update robot location
         self.move(rotation, movement)
-
-        print 'sensors',sensors
-        print 'rotation ',rotation,' movement ', movement
-        print 'heading ',self.heading,' location ', self.location
+        print 'After updaitng moves location ',self.location
         self.print_list(self.count_grid)
 
 
