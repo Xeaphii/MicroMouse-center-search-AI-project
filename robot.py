@@ -444,6 +444,11 @@ class Robot(object):
         rotation = 0
         movement = 1
         if self.is_changed_explorat:
+        
+            #Setting values for initial robot state
+            self.heading     = 'up'
+            self.location    = self.init_loc
+            
             #building heuristics
             self.build_heuristics()
             
@@ -459,10 +464,20 @@ class Robot(object):
             
             #setting is changed exploration function to false for not running these method again
             self.is_changed_explorat = False  
+            
+            
         
-        if (self.route):
+        if len(self.route)>1 and len(self.route) < self.steps_count:
             rotation, movement = self.route[self.steps_count]
+        
+        if self.isGoal((x,y)):
+            print 'Reached goal'
+        self.move(rotation, movement)    
+            
         self.steps_count +=1
+        
+        
+        
         return rotation, movement
 
     #Main method for moving robot
