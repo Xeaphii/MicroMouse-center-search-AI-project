@@ -262,10 +262,10 @@ class Robot(object):
             #print 'Done in steps: ',steps
             
             #sys.exit()
-            rotation = 'reset'
-            movement = 'reset'
+            rotation = 'Reset'
+            movement = 'Reset'
         #Update robot location
-        if self.is_exploration_done != True
+        if self.is_exploration_done != True:
             self.move(rotation, movement)
         
         return rotation, movement
@@ -467,10 +467,10 @@ class Robot(object):
             
             
         
-        if len(self.route)>1 and len(self.route) < self.steps_count:
+        if len(self.route)>1 and len(self.route) > self.steps_count:
             rotation, movement = self.route[self.steps_count]
         
-        if self.isGoal((x,y)):
+        if self.isGoal(self.location):
             print 'Reached goal'
         self.move(rotation, movement)    
             
@@ -478,7 +478,7 @@ class Robot(object):
         
         
         
-        return rotation, movement
+        return int(rotation), int( movement)
 
     #Main method for moving robot
     def next_move(self, sensors):
@@ -507,5 +507,6 @@ class Robot(object):
             rotation, movement = self.planned_movement (sensors)
         else:
             rotation, movement = self.robot_exploration(sensors)
-
+        
+        print rotation, movement
         return rotation, movement
