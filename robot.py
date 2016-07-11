@@ -223,11 +223,11 @@ class Robot(object):
             self.print_list(self.heuristics)
 
             print 'Now performing a star search'
-            action_grid,actions_list,actions_list_t = self.a_star_search()
+            action_grid,actions_list = self.a_star_search()
             self.print_list(action_grid)
             
             #Defining path for robot
-            route = self.get_route(actions_list,actions_list_t)
+            route = self.get_route(actions_list)
             self.print_list(route)
             
             sys.exit()
@@ -237,7 +237,7 @@ class Robot(object):
         
         return rotation, movement
     
-    def get_route(self,action_list,actions_list_t):
+    def get_route(self,action_list):
         
         prev_action = 0 # As the robot is faced up at start location
         move_list   = []
@@ -269,7 +269,7 @@ class Robot(object):
                     count_changed += 1
                     
             idx += (movement - 1) 
-            move_list.append([actions_list_t[idx - (movement - 1) ][1],rotation,movement])
+            move_list.append([rotation,movement])
             
             prev_action = dir_names.index(action_list[idx])
             idx +=1
@@ -336,7 +336,7 @@ class Robot(object):
         
         #Action list for actions in sequence
         actions_list = []
-        actions_list_t = []
+        
         
         action = [[' ' for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
 
@@ -391,7 +391,7 @@ class Robot(object):
                     action[x][y] = forward_name[min_action_index]#count#forward_arrows[dir_index_ar[idx]] 
                     #actions_list.append(forward_name[min_action_index])
                     actions_list.append(forward_name[min_action_index])
-                    actions_list_t.append([forward_name[min_action_index],[x,y]])
+                    
                     g2 = g 
 
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
@@ -400,7 +400,7 @@ class Robot(object):
                     #print '\n'
                     #action[x][y] = self.heading
         print 'Total steps without multiple movements taken are ',count
-        return action,actions_list,actions_list_t
+        return action,actions_list
 
 
     def next_move(self, sensors):
