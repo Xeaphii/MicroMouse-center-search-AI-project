@@ -313,11 +313,12 @@ class Robot(object):
                 y = next[3]
                 location = (x,y)
                 g = next[0]
-                count += 1
+                
                 
                 if self.isGoal((x,y)):
                     found = True
                 else:
+                    count += 1 #Its location should be here
                     allowed_actions_list = self.allowed_actions((x,y))
                     min_action_value = float('Inf')
                     
