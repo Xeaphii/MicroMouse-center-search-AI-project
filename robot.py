@@ -48,6 +48,8 @@ class Robot(object):
 
         self.heuristics = [[self.def_heu_val for row in range(self.no_of_rows)]
                  for col in range(self.no_of_cols)]
+         
+        self.route = []
 
         x,y = self.location
         #self.count_grid[x][y] = 1
@@ -60,6 +62,8 @@ class Robot(object):
         self.rotate_cost = 2
         self.normal_cost = 1
         self.is_exploration_done = False
+        self.is_changed_explorat = False
+        self.steps_count = 0   # used for optimal path
 
     #For checking percentage coverage
     def test_coverage():
@@ -240,8 +244,9 @@ class Robot(object):
 
             #Now moving for second run
             #time.sleep(0.5)
-
             
+            #setting is changed exploration for running route search method 
+            self.is_changed_explorat = True   
 
             #print 'Now printing heuristics'
             #self.print_list(self.heuristics)
@@ -257,9 +262,11 @@ class Robot(object):
             #print 'Done in steps: ',steps
             
             #sys.exit()
-            
+            rotation = 'reset'
+            movement = 'reset'
         #Update robot location
-        self.move(rotation, movement)
+        if self.is_exploration_done != True
+            self.move(rotation, movement)
         
         return rotation, movement
     
@@ -436,19 +443,26 @@ class Robot(object):
     def planned_movement(self,sensors):
         rotation = 0
         movement = 1
-        
-        #building heuristics
-        self.build_heuristics()
-        
-        #print 'Now performing a star search'
-        action_grid,actions_list = self.a_star_search()
-        
-        #print 'Now performing a star search'
-        action_grid,actions_list = self.a_star_search()
-        
-        #Defining path for robot
-        route,steps = self.get_route(actions_list)
+        if self.is_changed_explorat:
+            #building heuristics
+            self.build_heuristics()
             
+            #print 'Now performing a star search'
+            action_grid,actions_list = self.a_star_search()
+            
+            #print 'Now performing a star search'
+            action_grid,actions_list = self.a_star_search()
+            
+            #Defining path for robot
+            route,steps = self.get_route(actions_list)
+            self.route = route
+            
+            #setting is changed exploration function to false for not running these method again
+            self.is_changed_explorat = False  
+        
+        if (self.route) 
+        
+        self.steps_count +=1
         return rotation, movement
 
     #Main method for moving robot
