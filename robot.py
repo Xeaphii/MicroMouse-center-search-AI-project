@@ -9,7 +9,7 @@ forward = [[-1,  0], # go up
            [ 1,  0], # go down
            [ 0,  1]] # go right
 forward_name = ['U', 'R', 'D', 'R']
-forward_arrows = ['^', '<', 'v', '>']
+forward_name = ['^', '>', 'v', '<']
 
 # action has 3 values: right turn, no turn, left turn
 action = [1, 0, -1]
