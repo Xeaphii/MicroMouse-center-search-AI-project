@@ -276,6 +276,13 @@ class Robot(object):
                     self.update_heuristics(updated_loc, h_value+1)
 
 
+    def cost(self,index):
+        if index == 0 or index == 2:
+            return 1
+        else:
+            return 2
+
+
     #Searching using A star method for optimal path from start to end
     def a_star_search(self):
 
@@ -313,18 +320,19 @@ class Robot(object):
                 else:
                     allowed_actions_list = self.allowed_actions((x,y))
                     min_action_value = float('Inf')
+                    
                     for idx in allowed_actions_list:
-
+                        g = 0
                         updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
                         
                         if closed[updated_loc[0]][updated_loc[1]] == 0:
-                            
-                            if self.heuristics[updated_loc[0]][updated_loc[1]] < min_action_value:
-                                min_action_value = self.heuristics[updated_loc[0]][updated_loc[1]]
+                            g = self.cost(idx) + self.heuristics[updated_loc[0]][updated_loc[1]]
+                            if  g< min_action_value:
+                                min_action_value = g
                                 min_x2 ,min_y2   = updated_loc
                                 
                     action[min_x2][min_y2] = count#forward_arrows[dir_index_ar[idx]] 
-                    g2 = g + 1
+                    g2 = g 
                     self.print_list(action)
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
                     closed[min_x2][min_y2] = 1
