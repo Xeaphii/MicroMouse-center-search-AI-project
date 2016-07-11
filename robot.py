@@ -17,6 +17,7 @@ action_name = ['L', '#', 'R']
 
 dir_names   = ['up', 'left', 'down', 'right']
 angle_val = [-90, 0,90]
+rev_dir_index= [1,2,1,0]
 
 dir_index_ar = [0,3,2,1] # for up right down left wall orientation
 class Robot(object):
@@ -295,13 +296,17 @@ class Robot(object):
         g = 0
         h = self.heuristics[x][y]
         open = [[g+h,g, x, y]]
+        
+        #Doing some initialization here
+        self.heading     = 'up'
+        self.location    = self.init_loc
 
         found = False  # flag that is set when search is complete
         resign = False
         count = 0
         
         while not found and not resign:
-            time.sleep(0.5)
+            #time.sleep(0.1)
             if len(open) == 0:
                 resign = True
                 return "Fail"
@@ -321,7 +326,7 @@ class Robot(object):
                     count += 1 #Its location should be here
                     allowed_actions_list = self.allowed_actions((x,y))
                     min_action_value = float('Inf')
-                    
+                    min_action_index = 0
                     for idx in allowed_actions_list:
                         g = 0
                         updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
@@ -331,12 +336,20 @@ class Robot(object):
                             if  g< min_action_value:
                                 min_action_value = g
                                 min_x2 ,min_y2   = updated_loc
+                                min_action_index = idx
                                 
-                    action[min_x2][min_y2] = count#forward_arrows[dir_index_ar[idx]] 
+                    action[min_x2][min_y2] = idx#count#forward_arrows[dir_index_ar[idx]] 
                     g2 = g 
-                    self.print_list(action)
+
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
                     closed[min_x2][min_y2] = 1
+                    
+                    #Updating robot location
+                    rotation = rev_dir_index[min_action_index]
+                    rotation = angle_val[rotation]
+                    movement = 1
+                    self.move(rotation, movement)
+                    #action[x][y] = self.heading
         print 'Total steps without multiple movements taken are ',count
         return action
 
