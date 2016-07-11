@@ -243,10 +243,10 @@ class Robot(object):
         #Doing some initialization here
         self.heading     = 'up'
         self.location    = self.init_loc
-        
-        for action in action_list:
+        idx = 0
+        while idx < len(action_list):
             
-            index_loc = dir_names.index(action)
+            index_loc = dir_names.index(action_list[idx])
             index_loc = index_loc - prev_action
             if index_loc == 3 or index_loc == -1:
                 rotation = 90
@@ -259,9 +259,19 @@ class Robot(object):
             #Updating robot location
             movement = 1
             #self.move(rotation, movement)
-            prev_action = dir_names.index(action)
-            
+            count_changed = 0
+            for i in range(1,3):
+                if (idx+i < len(action_list) and action_list[idx] == action_list[idx+i]) or (count_changed == 1 and movement > 1):
+                    movement +=1
+                    
+                elif idx+i < len(action_list) and action_list[idx] != action_list[idx+i]:
+                    count_changed += 1
+                    
+            idx += (movement - 1) 
             move_list.append([rotation,movement])
+            prev_action = dir_names.index(action_list[idx])
+            
+            idx +=1
         return move_list    
 
     #Allowed actions for any mapped location of maze
