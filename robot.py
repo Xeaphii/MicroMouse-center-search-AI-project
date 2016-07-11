@@ -59,6 +59,7 @@ class Robot(object):
         self.no_of_dim   = 2
         self.rotate_cost = 2
         self.normal_cost = 1
+        self.is_exploration_done = False
 
     #For checking percentage coverage
     def test_coverage():
@@ -230,30 +231,33 @@ class Robot(object):
         #print self.isGoal(self.location)
         if self.is_all_space_explored() or self.count_steps >=900:
             print 'All Space explored, ready for optimization'
-
-            self.print_list(self.count_grid)
-            print 'Total steps takes ',self.count_steps
+            
+            #setting check for moving onto the second run
+            self.is_exploration_done = True
+            
+            #self.print_list(self.count_grid)
+            #print 'Total steps takes ',self.count_steps
 
             #Now moving for second run
-            time.sleep(0.5)
+            #time.sleep(0.5)
 
-            self.build_heuristics()
+            
 
-            print 'Now printing heuristics'
-            self.print_list(self.heuristics)
+            #print 'Now printing heuristics'
+            #self.print_list(self.heuristics)
 
-            print 'Now performing a star search'
-            action_grid,actions_list = self.a_star_search()
-            self.print_list(action_grid)
+            #print 'Now performing a star search'
+            #action_grid,actions_list = self.a_star_search()
+            #self.print_list(action_grid)
             
             #Defining path for robot
-            route,steps = self.get_route(actions_list)
+            #route,steps = self.get_route(actions_list)
             
-            self.print_list(route)
-            print 'Done in steps: ',steps
+            #self.print_list(route)
+            #print 'Done in steps: ',steps
             
-            sys.exit()
-        
+            #sys.exit()
+            
         #Update robot location
         self.move(rotation, movement)
         
@@ -347,6 +351,7 @@ class Robot(object):
 
     #Cost method for returing cost of turn 
     def cost(self,index):
+        #If the location is in the forward or backward direction
         if index == 0 or index == 2:
             return self.normal_cost
         else:
@@ -426,6 +431,25 @@ class Robot(object):
                     #action[x][y] = self.heading
         print 'Total steps without multiple movements taken are ',count
         return action,actions_list
+       
+    #For getting planned optimal path obtained from mapped maze
+    def planned_movement(self,sensors):
+        rotation = 0
+        movement = 1
+        
+        #building heuristics
+        self.build_heuristics()
+        
+        #print 'Now performing a star search'
+        action_grid,actions_list = self.a_star_search()
+        
+        #print 'Now performing a star search'
+        action_grid,actions_list = self.a_star_search()
+        
+        #Defining path for robot
+        route,steps = self.get_route(actions_list)
+            
+        return rotation, movement
 
     #Main method for moving robot
     def next_move(self, sensors):
@@ -450,6 +474,9 @@ class Robot(object):
         the tester to end the run and return the robot to the start.
         '''
         self.count_steps +=1
-        rotation, movement = self.robot_exploration(sensors)
+        if self.is_exploration_done:
+            rotation, movement = self.planned_movement (sensors)
+        else:
+            rotation, movement = self.robot_exploration(sensors)
 
         return rotation, movement
