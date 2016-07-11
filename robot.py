@@ -460,8 +460,8 @@ class Robot(object):
             #setting is changed exploration function to false for not running these method again
             self.is_changed_explorat = False  
         
-        if (self.route) 
-        
+        if (self.route):
+            rotation, movement = self.route[self.steps_count]
         self.steps_count +=1
         return rotation, movement
 
