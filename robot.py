@@ -8,7 +8,7 @@ forward = [[-1,  0], # go up
            [ 0, -1], # go left
            [ 1,  0], # go down
            [ 0,  1]] # go right
-forward_name = ['up', 'left', 'down', 'right']
+forward_name = ['U', 'R', 'D', 'R']
 forward_arrows = ['^', '<', 'v', '>']
 
 # action has 3 values: right turn, no turn, left turn
@@ -290,7 +290,7 @@ class Robot(object):
         closed = [[0 for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
         closed[self.init_loc[0]][self.init_loc[1]] = 1
 
-        action = [[-1 for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
+        action = [[' ' for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
 
         x,y = self.init_loc
         g = 0
@@ -306,7 +306,7 @@ class Robot(object):
         count = 0
         
         while not found and not resign:
-            #time.sleep(0.1)
+            #time.sleep(5)
             if len(open) == 0:
                 resign = True
                 return "Fail"
@@ -329,16 +329,18 @@ class Robot(object):
                     min_action_index = 0
                     for idx in allowed_actions_list:
                         g = 0
+                        #print 'allowed_actions_list ',allowed_actions_list
                         updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
                         
                         if closed[updated_loc[0]][updated_loc[1]] == 0:
                             g = self.cost(idx) + self.heuristics[updated_loc[0]][updated_loc[1]]
+                            #print 'possible states ',updated_loc,' g value ',g
                             if  g< min_action_value:
                                 min_action_value = g
                                 min_x2 ,min_y2   = updated_loc
                                 min_action_index = idx
                                 
-                    action[min_x2][min_y2] = idx#count#forward_arrows[dir_index_ar[idx]] 
+                    action[x][y] = forward_name[min_action_index]#count#forward_arrows[dir_index_ar[idx]] 
                     g2 = g 
 
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
@@ -349,6 +351,7 @@ class Robot(object):
                     rotation = angle_val[rotation]
                     movement = 1
                     self.move(rotation, movement)
+                    #print '\n'
                     #action[x][y] = self.heading
         print 'Total steps without multiple movements taken are ',count
         return action
