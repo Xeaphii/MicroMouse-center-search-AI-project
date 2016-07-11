@@ -294,7 +294,7 @@ class Robot(object):
         count = 0
         
         while not found and not resign:
-            time.sleep(2)
+            time.sleep(0.5)
             if len(open) == 0:
                 resign = True
                 return "Fail"
@@ -313,18 +313,22 @@ class Robot(object):
                 else:
                     allowed_actions_list = self.allowed_actions((x,y))
                     #print 'allowed_actions_list ',allowed_actions_list
+                    min_action_value = float('Inf')
                     for idx in allowed_actions_list:
 
                         updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
                         
                         if closed[updated_loc[0]][updated_loc[1]] == 0:
-                            min_action_value = float('Inf')
+                            
                             print 'updated_loc ',updated_loc,' self.heuristics ',self.heuristics[updated_loc[0]][updated_loc[1]]
                             if self.heuristics[updated_loc[0]][updated_loc[1]] < min_action_value:
+                                print 'heu ',self.heuristics[updated_loc[0]][updated_loc[1]] ,' min_val ', min_action_value
                                 min_action_value = self.heuristics[updated_loc[0]][updated_loc[1]]
                                 min_x2 ,min_y2   = updated_loc
+                                print min_action_value , ' coordinates for this loc are ',min_x2,' ',min_y2
                                 
-                    action[min_x2][min_y2] = count#forward_arrows[dir_index_ar[idx]]            
+                    action[min_x2][min_y2] = count#forward_arrows[dir_index_ar[idx]] 
+                    print 'min values ',min_x2,' ',min_y2           
                     g2 = g + 1
                     self.print_list(action)
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
