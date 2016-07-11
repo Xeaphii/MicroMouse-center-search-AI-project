@@ -57,10 +57,20 @@ class Robot(object):
         self.count_steps = 0
         self.size_of_goal= 2
         self.no_of_dim   = 2
+        self.rotate_cost = 2
+        self.normal_cost = 1
 
-
+    #For checking percentage coverage
     def test_coverage():
-        return 
+        sum_of_values = 0
+        for i in range(len(self.count_grid)):
+            for j in range(len(self.count_grid[0])):
+                if self.count_grid[i][j] !=0:
+                    sum_of_values +=1
+        normalized_coverage = sum_of_values/(len(self.count_grid) * len(self.count_grid[0]))
+        return normalized_coverage
+
+    #Return whether goal is acheived 
     def isGoal(self, location):
         row_no, col_no = location
         return (self.no_of_rows/2-1) <= row_no \
@@ -68,6 +78,7 @@ class Robot(object):
                (self.no_of_cols/2-1) <= col_no \
                and col_no <= (self.no_of_cols/2)
 
+    # for checking whether whole maze is explored while in the exploration phase
     def is_all_space_explored(self):
         for i in range(len(self.count_grid)):
             for j in range(len(self.count_grid[0])):
@@ -75,6 +86,7 @@ class Robot(object):
                     return False
         return True
 
+    #Adjusted move for robot for keeping track of internal state and respective variables
     def move(self, steering, distance):
 
         # make a new copy
@@ -87,26 +99,31 @@ class Robot(object):
         self.location  = [ self.location[i]+delta[i]*distance for i in range(2) ]
         #return    (direction, location)
 
+    #Helper method for printing the list of list i.e matriz 
     def print_list(self,input_list):
         for inner_list in input_list:
             print inner_list,'\n'
         print '\n \n'
 
+    #helper method for updating counter grid
     def update_counter(self):
         #Updating location count     
         x,y = self.location
         self.count_grid[x][y]  += 1
 
+    #helper method for updating dead ends grid
     def update_deadends(self):
         #Updating location count     
         x,y = self.location
         self.deadend_grid[x][y]  += 1
 
+    #helper method for updating heuristics grid
     def update_heuristics(self,location,h_value):
         #Updating location count     
         x,y = location
         self.heuristics[x][y] = h_value
 
+    #helper method for updating mapping grid
     def update_mapping(self,value):
         #Updating location count     
         # - up = 1 = 2^0 = 2^Direction.N.value 
@@ -117,6 +134,7 @@ class Robot(object):
         x,y = self.location
         self.mapped_grid[x][y] = value
 
+    #Helper method for doing weighted average of choices
     def weighted_choice(self,choices):
         values, weights = zip(*choices)
         total = 0
@@ -128,6 +146,7 @@ class Robot(object):
         i = bisect(cum_weights, x)
         return values[i]
 
+    #Simulate move function without updating robot internal states and respective variables
     def simulate_move(self, steering, distance):
 
         # make a new copy
@@ -138,6 +157,7 @@ class Robot(object):
         delta     = forward[dir_index] 
         return [ self.location[i]+delta[i]*distance for i in range(2) ]
 
+    #Helper method for getting corrected robot orientation
     def get_corrected_orientation(self, steering):
 
         # make a new copy
@@ -146,7 +166,7 @@ class Robot(object):
         dir_index = (curr_pos+action[act_index])%len(dir_names)
         return dir_index_ar[dir_index]
 
-
+    #for robot exploration in the first run
     def robot_exploration(self,sensors):
 
         #For updating mapping of space start
@@ -208,7 +228,7 @@ class Robot(object):
         self.update_mapping(value) #Updates value for mapping
 
         #print self.isGoal(self.location)
-        if self.is_all_space_explored():
+        if self.is_all_space_explored() or self.count_steps >=900:
             print 'All Space explored, ready for optimization'
 
             self.print_list(self.count_grid)
@@ -227,8 +247,10 @@ class Robot(object):
             self.print_list(action_grid)
             
             #Defining path for robot
-            route = self.get_route(actions_list)
+            route,steps = self.get_route(actions_list)
+            
             self.print_list(route)
+            print 'Done in steps: ',steps
             
             sys.exit()
         
@@ -237,6 +259,7 @@ class Robot(object):
         
         return rotation, movement
     
+    #Method to get route from given action list
     def get_route(self,action_list):
         
         prev_action = 0 # As the robot is faced up at start location
@@ -245,8 +268,9 @@ class Robot(object):
         self.heading     = 'up'
         self.location    = self.init_loc
         idx = 0
+        count = 0
         while idx < len(action_list):
-            
+            count +=1
             index_loc = dir_names.index(action_list[idx])
             index_loc = index_loc - prev_action
             if index_loc == 3 or index_loc == -1:
@@ -273,7 +297,7 @@ class Robot(object):
             
             prev_action = dir_names.index(action_list[idx])
             idx +=1
-        return move_list    
+        return move_list,count    
 
     #Allowed actions for any mapped location of maze
     def allowed_actions(self,location):
@@ -321,11 +345,12 @@ class Robot(object):
                     self.update_heuristics(updated_loc, h_value+1)
 
 
+    #Cost method for returing cost of turn 
     def cost(self,index):
         if index == 0 or index == 2:
-            return 1
+            return self.normal_cost
         else:
-            return 2
+            return self.rotate_cost
 
 
     #Searching using A star method for optimal path from start to end
@@ -402,7 +427,7 @@ class Robot(object):
         print 'Total steps without multiple movements taken are ',count
         return action,actions_list
 
-
+    #Main method for moving robot
     def next_move(self, sensors):
         '''
         Use this function to determine the next move the robot should make,
