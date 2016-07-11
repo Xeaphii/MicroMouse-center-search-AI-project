@@ -223,11 +223,11 @@ class Robot(object):
             self.print_list(self.heuristics)
 
             print 'Now performing a star search'
-            action_grid,actions_list = self.a_star_search()
+            action_grid,actions_list,actions_list_t = self.a_star_search()
             self.print_list(action_grid)
             
             #Defining path for robot
-            route = self.get_route(actions_list)
+            route = self.get_route(actions_list,actions_list_t)
             self.print_list(route)
             
             sys.exit()
@@ -237,7 +237,8 @@ class Robot(object):
         
         return rotation, movement
     
-    def get_route(self,action_list):
+    def get_route(self,action_list,actions_list_t):
+        
         prev_action = 0 # As the robot is faced up at start location
         move_list   = []
         #Doing some initialization here
@@ -261,16 +262,16 @@ class Robot(object):
             #self.move(rotation, movement)
             count_changed = 0
             for i in range(1,3):
-                if (idx+i < len(action_list) and action_list[idx] == action_list[idx+i]) or (count_changed == 1 and movement > 1):
+                if (idx+i < len(action_list) and action_list[idx] == action_list[idx+i] and count_changed == 0) or (count_changed == 1 and movement > 1):
                     movement +=1
                     
                 elif idx+i < len(action_list) and action_list[idx] != action_list[idx+i]:
                     count_changed += 1
                     
             idx += (movement - 1) 
-            move_list.append([rotation,movement])
-            prev_action = dir_names.index(action_list[idx])
+            move_list.append([actions_list_t[idx - (movement - 1) ][1],rotation,movement])
             
+            prev_action = dir_names.index(action_list[idx])
             idx +=1
         return move_list    
 
@@ -335,6 +336,7 @@ class Robot(object):
         
         #Action list for actions in sequence
         actions_list = []
+        actions_list_t = []
         
         action = [[' ' for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
 
@@ -387,7 +389,9 @@ class Robot(object):
                                 min_action_index = idx
                                 
                     action[x][y] = forward_name[min_action_index]#count#forward_arrows[dir_index_ar[idx]] 
+                    #actions_list.append(forward_name[min_action_index])
                     actions_list.append(forward_name[min_action_index])
+                    actions_list_t.append([forward_name[min_action_index],[x,y]])
                     g2 = g 
 
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
@@ -396,7 +400,7 @@ class Robot(object):
                     #print '\n'
                     #action[x][y] = self.heading
         print 'Total steps without multiple movements taken are ',count
-        return action,actions_list
+        return action,actions_list,actions_list_t
 
 
     def next_move(self, sensors):
