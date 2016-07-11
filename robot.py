@@ -9,6 +9,7 @@ forward = [[-1,  0], # go up
            [ 1,  0], # go down
            [ 0,  1]] # go right
 forward_name = ['up', 'left', 'down', 'right']
+forward_arrows = ['^', '<', 'v', '>']
 
 # action has 3 values: right turn, no turn, left turn
 action = [1, 0, -1]
@@ -156,10 +157,6 @@ class Robot(object):
             if sensor_reading>0:
                 value += 2**cor_index
 
-               
-        
-
-
         #For updating mapping of space end
 
         #time.sleep(0.1)
@@ -297,6 +294,7 @@ class Robot(object):
         count = 0
         
         while not found and not resign:
+            time.sleep(2)
             if len(open) == 0:
                 resign = True
                 return "Fail"
@@ -314,21 +312,25 @@ class Robot(object):
                     found = True
                 else:
                     allowed_actions_list = self.allowed_actions((x,y))
+                    #print 'allowed_actions_list ',allowed_actions_list
                     for idx in allowed_actions_list:
+
                         updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
                         
                         if closed[updated_loc[0]][updated_loc[1]] == 0:
                             min_action_value = float('Inf')
-                            
-                            g2 = 0
-                            if g2+self.heuristics[updated_loc[0]][updated_loc[1]] < min_action_value:
-                                min_action_value = g2+self.heuristics[updated_loc[0]][updated_loc[1]]
-                                min_x2 ,min_y2  = updated_loc
-                                action[updated_loc[0]][updated_loc[1]] = idx
+                            print 'updated_loc ',updated_loc,' self.heuristics ',self.heuristics[updated_loc[0]][updated_loc[1]]
+                            if self.heuristics[updated_loc[0]][updated_loc[1]] < min_action_value:
+                                min_action_value = self.heuristics[updated_loc[0]][updated_loc[1]]
+                                min_x2 ,min_y2   = updated_loc
                                 
+                    action[min_x2][min_y2] = count#forward_arrows[dir_index_ar[idx]]            
                     g2 = g + 1
+                    self.print_list(action)
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
                     closed[min_x2][min_y2] = 1
+                    #print 'open stack ',open
+                    print '\n'
 
         return action
 
