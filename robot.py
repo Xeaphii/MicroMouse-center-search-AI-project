@@ -8,8 +8,8 @@ forward = [[-1,  0], # go up
            [ 0, -1], # go left
            [ 1,  0], # go down
            [ 0,  1]] # go right
-forward_name = ['U', 'R', 'D', 'R']
-forward_name = ['^', '>', 'v', '<']
+forward_name = ['up', 'right', 'down', 'left']
+#forward_name = ['^', '>', 'v', '<']
 
 # action has 3 values: right turn, no turn, left turn
 action = [1, 0, -1]
@@ -223,17 +223,50 @@ class Robot(object):
             self.print_list(self.heuristics)
 
             print 'Now performing a star search'
-            self.print_list(self.a_star_search())
-
+            action_grid,actions_list = self.a_star_search()
+            self.print_list(action_grid)
+            
+            #Defining path for robot
+            route = self.get_route(actions_list)
+            self.print_list(route)
+            
             sys.exit()
         
         #Update robot location
         self.move(rotation, movement)
         
         return rotation, movement
+    
+    def get_route(self,action_list):
+        prev_action = 0 # As the robot is faced up at start location
+        move_list   = []
+        #Doing some initialization here
+        self.heading     = 'up'
+        self.location    = self.init_loc
+        
+        for action in action_list:
+            
+            index_loc = dir_names.index(action)
+            index_loc = index_loc - prev_action
+            if index_loc == 3 or index_loc == -1:
+                rotation = 90
+            elif index_loc == -3 or index_loc == 1:
+                rotation = -90
+            else:
+                rotation = 0
+            #rotation  = index_loc * 90
+            
+            #Updating robot location
+            movement = 1
+            #self.move(rotation, movement)
+            prev_action = dir_names.index(action)
+            
+            move_list.append([rotation,movement])
+        return move_list    
 
     #Allowed actions for any mapped location of maze
     def allowed_actions(self,location):
+        
         allowed_actions_list = []
         x,y = location
 
@@ -289,7 +322,10 @@ class Robot(object):
 
         closed = [[0 for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
         closed[self.init_loc[0]][self.init_loc[1]] = 1
-
+        
+        #Action list for actions in sequence
+        actions_list = []
+        
         action = [[' ' for col in range(self.no_of_cols)] for row in range(self.no_of_rows)]
 
         x,y = self.init_loc
@@ -298,8 +334,8 @@ class Robot(object):
         open = [[g+h,g, x, y]]
         
         #Doing some initialization here
-        self.heading     = 'up'
-        self.location    = self.init_loc
+        #self.heading     = 'up'
+        #self.location    = self.init_loc
 
         found = False  # flag that is set when search is complete
         resign = False
@@ -341,20 +377,16 @@ class Robot(object):
                                 min_action_index = idx
                                 
                     action[x][y] = forward_name[min_action_index]#count#forward_arrows[dir_index_ar[idx]] 
+                    actions_list.append(forward_name[min_action_index])
                     g2 = g 
 
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
                     closed[min_x2][min_y2] = 1
                     
-                    #Updating robot location
-                    rotation = rev_dir_index[min_action_index]
-                    rotation = angle_val[rotation]
-                    movement = 1
-                    self.move(rotation, movement)
                     #print '\n'
                     #action[x][y] = self.heading
         print 'Total steps without multiple movements taken are ',count
-        return action
+        return action,actions_list
 
 
     def next_move(self, sensors):
