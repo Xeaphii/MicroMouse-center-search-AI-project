@@ -422,6 +422,14 @@ class Robot(object):
         count = 0
         
         while not found and not resign:
+            
+            #Needed to be removed later
+            if count > 6:
+                self.print_list(self.heuristics)
+                sys.exit()
+                
+            #Needed to be removed later   
+                
             #time.sleep(5)
             if len(open) == 0:
                 resign = True
@@ -450,6 +458,12 @@ class Robot(object):
                         
                         if closed[updated_loc[0]][updated_loc[1]] == 0:
                             g = self.cost(idx) + self.heuristics[updated_loc[0]][updated_loc[1]]
+                            
+                            #Needed to be removed later
+                            print 'prev loc',(x,y) , ' updated_loc ',updated_loc,' heuristics ',self.heuristics[updated_loc[0]][updated_loc[1]],' cost ',self.cost(idx),' index ',idx ,'  allowed_actions_list ',allowed_actions_list
+                            #Needed to be removed later
+                            
+                            
                             #print 'possible states ',updated_loc,' g value ',g
                             if  g< min_action_value:
                                 min_action_value = g
@@ -464,9 +478,11 @@ class Robot(object):
 
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
                     closed[min_x2][min_y2] = 1
-                    
-                    #print '\n'
+                    #Needed to be removed later
+                    print 'Chosen locaction ',(min_x2,min_y2)
+                    print '\n'
                     #action[x][y] = self.heading
+                    #Needed to be removed later
         print 'Total steps without multiple movements taken are ',count
         return action,actions_list
        
@@ -493,11 +509,13 @@ class Robot(object):
             
             #setting is changed exploration function to false for not running these method again
             self.is_changed_explorat = False  
+            
             print 'Total steps with multiple steps ', len(self.route)
+            #Needed to be removed later
             self.print_list(self.heuristics)
             self.print_list(self.route)
             sys.exit()
-            
+            #Needed to be removed later
         
         if len(self.route)>1 and len(self.route) > self.steps_count:
             rotation, movement = self.route[self.steps_count]
