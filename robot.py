@@ -62,12 +62,13 @@ class Robot(object):
         self.count_steps = 0
         self.size_of_goal= 2
         self.no_of_dim   = 2
-        self.rotate_cost = 1
+        self.rotate_cost = 2
         self.normal_cost = 1
         self.is_exploration_done = False
         self.is_changed_explorat = False
         self.steps_count = 0   # used for optimal path
         self.deadends_weight = 10000
+        self.initial_heuristics_power = 0.5
         
         #Making initial heuristics for exploration
         self.initial_heuristics()
@@ -228,11 +229,6 @@ class Robot(object):
                 weighted_array.append(self.count_grid[x][y])
                 sensor_mapped.append(sensors_item)
             else:
-                #Needed to be removed later
-                #print 'Reached in the dead inside array of length 0, sensors ',sensors_array,' at loc ',( x,y),' count '
-                #sys.exit()
-                #Needed to be removed later
-                #return 1
                 weighted_array.append(self.deadends_weight) #Avoid next deadends
                 sensor_mapped.append(sensors_item)
                 
@@ -252,11 +248,6 @@ class Robot(object):
                 weighted_array.append(self.count_grid[x][y] + self.init_heuristics[x][y])
                 sensor_mapped.append(sensors_item)
             else:
-                #Needed to be removed later
-                #print 'Reached in the dead inside array of length 0, sensors ',sensors_array,' at loc ',( x,y),' count '
-                #sys.exit()
-                #Needed to be removed later
-                #return 1
                 weighted_array.append(self.deadends_weight) #Avoid next deadends
                 sensor_mapped.append(sensors_item)
                 
@@ -457,13 +448,6 @@ class Robot(object):
 
            
             allowed_actions_list = self.allowed_actions(location)
-                
-            #Needed to remove later
-            #print 'location ',location
-            #if location == [0,4]:
-            #    print 'Reached unknown loc, allowed Loc ',allowed_actions_list
-            #    sys.exit()
-            #Needed to remove later
              
             for idx in allowed_actions_list:
                 
@@ -479,7 +463,7 @@ class Robot(object):
                     rotation = 0
                     
                     self.move(rotation, movement) 
-                    local_cost = 1 if prev_action == idx or prev_action == -1 else 2
+                    local_cost = self.normal_cost if prev_action == idx or prev_action == -1 else self.rotate_cost
                     stacked_positions.append((updated_loc,h_value+local_cost,idx))
                     self.update_heuristics(updated_loc, h_value+local_cost)
 
@@ -520,12 +504,6 @@ class Robot(object):
         
         while not found and not resign:
         
-            #Needed to be removed later
-            #print 'Count in the A star ',count,' open ',open,' '
-            #time.sleep(2)
-            #Needed to be removed later
-            
-            #time.sleep(5)
             if len(open) == 0:
                 resign = True
                 return "Fail"
@@ -547,27 +525,13 @@ class Robot(object):
                     min_action_value = float('Inf')
                     min_action_index = 0
                     
-                    #Needed to remove later
-                    #print 'allowed_actions_list ',allowed_actions_list,' location ',(x,y),' mapped ',self.mapped_grid[x][y]
-                    #Needed to remove later
-                    
                     for idx in allowed_actions_list:
                         g = 0
                         #print 'allowed_actions_list ',allowed_actions_list
-                        updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
-                        
-                        
-                        #Needed to remove later  
-                        #print 'possible states ',updated_loc,' g value ',g,' closed ',closed[updated_loc[0]][updated_loc[1]],' allowed ',allowed_actions_list
-                        #Needed to remove later   
+                        updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)] 
                         
                         if closed[updated_loc[0]][updated_loc[1]] == 0 and self.mapped_grid[updated_loc[0]][updated_loc[1]] != 0:
                             g = self.cost(idx) + self.heuristics[updated_loc[0]][updated_loc[1]]
-                            
-                            #Needed to remove later  
-                            #print 'possible states ',updated_loc,' g value ',g
-                            #Needed to remove later    
-                            
                             
                             if  g< min_action_value:
                                 min_action_value = g
@@ -609,15 +573,8 @@ class Robot(object):
             #building heuristics
             self.build_heuristics()
             
-            #Needed to be removed later
-            #self.print_list(self.heuristics)
-            #Needed to be removed later
-            
             #print 'Now performing a star search'
             action_grid,actions_list = self.a_star_search()
-            #Needed to be removed later
-            #self.print_list(action_grid)
-            #Needed to be removed later
             
             #self.print_list(action_grid)
             #Defining path for robot
@@ -645,7 +602,7 @@ class Robot(object):
         for x in range(0,self.no_of_cols/2):
             for i in  range(x,self.no_of_cols-x):
                 for j in range(x,self.no_of_rows-x):
-                    self.init_heuristics[i][j] = ((self.no_of_cols/2) - x -1)**0.5
+                    self.init_heuristics[i][j] = ((self.no_of_cols/2) - x -1)**self.initial_heuristics_power
 
     #Main method for moving robot
     def next_move(self, sensors):
@@ -675,10 +632,5 @@ class Robot(object):
         else:
             rotation, movement = self.robot_exploration(sensors)
             
-        #Needed to be removed later
-        #print rotation, movement
-        
-        #print 'on step ',self.count_steps
-        #Needed to be removed later
         return rotation, movement
         
