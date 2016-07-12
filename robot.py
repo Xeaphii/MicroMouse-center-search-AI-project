@@ -178,6 +178,7 @@ class Robot(object):
         dir_index = (curr_pos+action[act_index])%len(dir_names)
         return dir_index_ar[dir_index]
 
+        
     # Weighted explorator for count probability
     def weighted_prob_exploration(self,sensors_array):
         weighted_array = []
@@ -185,10 +186,10 @@ class Robot(object):
             x,y = self.simulate_move(angle_val[sensors_item],1)
 
             if self.count_grid[x][y] == 0:
-                sensor_weight = self.self_exploration_val 
+                sensor_weight = self.self_exploration_val  
             else:
                 if self.deadend_grid[x][y] == 1:
-                    sensor_weight = self.epsilon_val
+                    sensor_weight = self.epsilon_val 
                 else:
                     sensor_weight = self.self_exploration_val **(-self.count_grid[x][y])
                     
@@ -197,7 +198,25 @@ class Robot(object):
         #For more space exploration, 
         return self.weighted_choice(weighted_array)
 
+    # Weighted explorator for count probability
+    def weighted_prob_exploration_heu(self,sensors_array):
+        weighted_array = []
+        for sensors_item in sensors_array:
+            x,y = self.simulate_move(angle_val[sensors_item],1)
 
+            if self.count_grid[x][y] == 0:
+                sensor_weight = self.self_exploration_val  + self.init_heuristics[x][y]
+            else:
+                if self.deadend_grid[x][y] == 1:
+                    sensor_weight = self.epsilon_val 
+                else:
+                    sensor_weight = (self.self_exploration_val+ self.init_heuristics[x][y]) **(-self.count_grid[x][y])
+                    
+
+            weighted_array.append((sensors_item,sensor_weight))
+        #For more space exploration, 
+        return self.weighted_choice(weighted_array)
+        
     # Weighted explorator for count probability
     def counting_exploration(self,sensors_array):
         weighted_array = []
@@ -293,6 +312,9 @@ class Robot(object):
             
             #For counting explorator without wieghted probability
             rand_index = self.counting_exploration_heuristic(sensors_array)
+            
+            #For counting explorator with wieghted probability and heuristics
+            #rand_index = self.weighted_prob_exploration_heu(sensors_array)            
 
             #print 'rand_index ',rand_index
             rotation = angle_val[rand_index]
@@ -433,8 +455,16 @@ class Robot(object):
                 
             location , h_value,prev_action = stacked_positions.pop(0)
 
+           
             allowed_actions_list = self.allowed_actions(location)
-
+                
+            #Needed to remove later
+            #print 'location ',location
+            #if location == [0,4]:
+            #    print 'Reached unknown loc, allowed Loc ',allowed_actions_list
+            #    sys.exit()
+            #Needed to remove later
+             
             for idx in allowed_actions_list:
                 
                 #Keeping trakc of robot new orientation
@@ -443,7 +473,7 @@ class Robot(object):
                 
                 updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
                 
-                if self.heuristics[updated_loc[0]][updated_loc[1]] == self.def_heu_val:
+                if self.heuristics[updated_loc[0]][updated_loc[1]] == self.def_heu_val and self.mapped_grid[updated_loc[0]][updated_loc[1]] !=0:
                 
                     movement = 1
                     rotation = 0
@@ -489,8 +519,12 @@ class Robot(object):
         count = 0
         
         while not found and not resign:
+        
+            #Needed to be removed later
+            print 'Count in the A star ',count,' open ',open,' '
+            #time.sleep(2)
+            #Needed to be removed later
             
-                
             #time.sleep(5)
             if len(open) == 0:
                 resign = True
@@ -512,30 +546,53 @@ class Robot(object):
                     allowed_actions_list = self.allowed_actions((x,y))
                     min_action_value = float('Inf')
                     min_action_index = 0
+                    
+                    #Needed to remove later
+                    print 'allowed_actions_list ',allowed_actions_list,' location ',(x,y),' mapped ',self.mapped_grid[x][y]
+                    #Needed to remove later
+                    
                     for idx in allowed_actions_list:
                         g = 0
                         #print 'allowed_actions_list ',allowed_actions_list
                         updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
                         
-                        if closed[updated_loc[0]][updated_loc[1]] == 0:
+                        
+                        #Needed to remove later  
+                        print 'possible states ',updated_loc,' g value ',g,' closed ',closed[updated_loc[0]][updated_loc[1]],' allowed ',allowed_actions_list
+                        #Needed to remove later   
+                        
+                        if closed[updated_loc[0]][updated_loc[1]] == 0 and self.mapped_grid[updated_loc[0]][updated_loc[1]] != 0:
                             g = self.cost(idx) + self.heuristics[updated_loc[0]][updated_loc[1]]
                             
-                            
-                            
+                            #Needed to remove later  
                             #print 'possible states ',updated_loc,' g value ',g
+                            #Needed to remove later    
+                            
+                            
                             if  g< min_action_value:
                                 min_action_value = g
                                 min_x2 ,min_y2   = updated_loc
                                 min_action_index = idx
+                            
+                            
+                    #Needed to remove later       
+                    print 'Chosen location ',(min_x2 ,min_y2)
+                    if min_action_value == float('Inf'):
+                        #self.print_list(action)
+                        self.print_list(self.heuristics)
+                        self.print_list(self.mapped_grid)
+                        print 'Donot find any location'
+                        sys.exit()
+                    #Needed to remove later  
                                 
                     action[x][y] = forward_name[min_action_index]#count#forward_arrows[dir_index_ar[idx]] 
                     #actions_list.append(forward_name[min_action_index])
                     actions_list.append(forward_name[min_action_index])
                     
-                     #g 
 
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
                     closed[min_x2][min_y2] = 1
+                    print '\n'
                     
         print 'Total steps without multiple movements taken are ',count
         return action,actions_list
@@ -553,8 +610,15 @@ class Robot(object):
             #building heuristics
             self.build_heuristics()
             
+            #Needed to be removed later
+            self.print_list(self.heuristics)
+            #Needed to be removed later
+            
             #print 'Now performing a star search'
             action_grid,actions_list = self.a_star_search()
+            #Needed to be removed later
+            self.print_list(action_grid)
+            #Needed to be removed later
             
             #self.print_list(action_grid)
             #Defining path for robot
@@ -611,6 +675,11 @@ class Robot(object):
             rotation, movement = self.planned_movement (sensors)
         else:
             rotation, movement = self.robot_exploration(sensors)
-        
+            
+        #Needed to be removed later
         #print rotation, movement
+        
+        print 'on step ',self.count_steps
+        #Needed to be removed later
         return rotation, movement
+        
