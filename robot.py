@@ -521,7 +521,7 @@ class Robot(object):
         while not found and not resign:
         
             #Needed to be removed later
-            print 'Count in the A star ',count,' open ',open,' '
+            #print 'Count in the A star ',count,' open ',open,' '
             #time.sleep(2)
             #Needed to be removed later
             
@@ -548,7 +548,7 @@ class Robot(object):
                     min_action_index = 0
                     
                     #Needed to remove later
-                    print 'allowed_actions_list ',allowed_actions_list,' location ',(x,y),' mapped ',self.mapped_grid[x][y]
+                    #print 'allowed_actions_list ',allowed_actions_list,' location ',(x,y),' mapped ',self.mapped_grid[x][y]
                     #Needed to remove later
                     
                     for idx in allowed_actions_list:
@@ -558,7 +558,7 @@ class Robot(object):
                         
                         
                         #Needed to remove later  
-                        print 'possible states ',updated_loc,' g value ',g,' closed ',closed[updated_loc[0]][updated_loc[1]],' allowed ',allowed_actions_list
+                        #print 'possible states ',updated_loc,' g value ',g,' closed ',closed[updated_loc[0]][updated_loc[1]],' allowed ',allowed_actions_list
                         #Needed to remove later   
                         
                         if closed[updated_loc[0]][updated_loc[1]] == 0 and self.mapped_grid[updated_loc[0]][updated_loc[1]] != 0:
@@ -576,7 +576,7 @@ class Robot(object):
                             
                             
                     #Needed to remove later       
-                    print 'Chosen location ',(min_x2 ,min_y2)
+                    #print 'Chosen location ',(min_x2 ,min_y2)
                     if min_action_value == float('Inf'):
                         #self.print_list(action)
                         self.print_list(self.heuristics)
@@ -592,7 +592,6 @@ class Robot(object):
 
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
                     closed[min_x2][min_y2] = 1
-                    print '\n'
                     
         print 'Total steps without multiple movements taken are ',count
         return action,actions_list
@@ -611,13 +610,13 @@ class Robot(object):
             self.build_heuristics()
             
             #Needed to be removed later
-            self.print_list(self.heuristics)
+            #self.print_list(self.heuristics)
             #Needed to be removed later
             
             #print 'Now performing a star search'
             action_grid,actions_list = self.a_star_search()
             #Needed to be removed later
-            self.print_list(action_grid)
+            #self.print_list(action_grid)
             #Needed to be removed later
             
             #self.print_list(action_grid)
@@ -679,7 +678,7 @@ class Robot(object):
         #Needed to be removed later
         #print rotation, movement
         
-        print 'on step ',self.count_steps
+        #print 'on step ',self.count_steps
         #Needed to be removed later
         return rotation, movement
         
