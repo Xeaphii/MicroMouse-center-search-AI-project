@@ -171,6 +171,24 @@ class Robot(object):
         dir_index = (curr_pos+action[act_index])%len(dir_names)
         return dir_index_ar[dir_index]
 
+    # Weighted explorator for count probability
+    def weighted_prob_exploration(self,sensors_array):
+        weighted_array = []
+        for sensors_item in sensors_array:
+            x,y = self.simulate_move(angle_val[sensors_item],1)
+
+            if self.count_grid[x][y] == 0:
+                sensor_weight = self.self_exploration_val 
+            else:
+                if self.deadend_grid[x][y] == 1:
+                    sensor_weight = self.epsilon_val
+                else:
+                    sensor_weight = self.self_exploration_val **(-self.count_grid[x][y])
+
+            weighted_array.append((sensors_item,sensor_weight))
+        #For more space exploration, 
+        return self.weighted_choice(weighted_array)
+
     #for robot exploration in the first run
     def robot_exploration(self,sensors):
 
@@ -203,21 +221,9 @@ class Robot(object):
             #Assigns random value to the turn for initial exploration
             #rand_index = random.choice(sensors_array)
 
-            weighted_array = []
-            for sensors_item in sensors_array:
-                x,y = self.simulate_move(angle_val[sensors_item],1)
+            # Place for brain of exploration
+            rand_index = self.weighted_prob_exploration(sensors_array)
 
-                if self.count_grid[x][y] == 0:
-                    sensor_weight = self.self_exploration_val 
-                else:
-                    if self.deadend_grid[x][y] == 1:
-                        sensor_weight = self.epsilon_val
-                    else:
-                        sensor_weight = self.self_exploration_val **(-self.count_grid[x][y])
-
-                weighted_array.append((sensors_item,sensor_weight))
-            #For more space exploration, 
-            rand_index = self.weighted_choice(weighted_array)
 
             rotation = angle_val[rand_index]
             movement = 1
@@ -234,7 +240,7 @@ class Robot(object):
 
         #print self.isGoal(self.location)
         if self.is_all_space_explored() or self.count_steps >=900:
-            print 'All Space explored, ready for optimization'
+            print 'All Space explored, ready for optimization steps are ',self.count_steps
             
             #setting check for moving onto the second run
             self.is_exploration_done = True
@@ -455,8 +461,6 @@ class Robot(object):
             #print 'Now performing a star search'
             action_grid,actions_list = self.a_star_search()
             
-            #print 'Now performing a star search'
-            action_grid,actions_list = self.a_star_search()
             
             #Defining path for robot
             route,steps = self.get_route(actions_list)
@@ -464,6 +468,7 @@ class Robot(object):
             
             #setting is changed exploration function to false for not running these method again
             self.is_changed_explorat = False  
+            print 'Total steps with multiple steps ', len(self.route)
             
             
         
@@ -508,5 +513,5 @@ class Robot(object):
         else:
             rotation, movement = self.robot_exploration(sensors)
         
-        print rotation, movement
+        #print rotation, movement
         return rotation, movement
