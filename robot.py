@@ -49,6 +49,9 @@ class Robot(object):
         self.heuristics = [[self.def_heu_val for row in range(self.no_of_rows)]
                  for col in range(self.no_of_cols)]
          
+        self.init_heuristics = [[self.def_heu_val for row in range(self.no_of_rows)]
+                 for col in range(self.no_of_cols)]
+                 
         self.route = []
 
         x,y = self.location
@@ -64,6 +67,10 @@ class Robot(object):
         self.is_exploration_done = False
         self.is_changed_explorat = False
         self.steps_count = 0   # used for optimal path
+        self.deadends_weight = 10000
+        
+        #Making initial heuristics for exploration
+        self.initial_heuristics()
 
     #For checking percentage coverage
     def test_coverage():
@@ -184,6 +191,7 @@ class Robot(object):
                     sensor_weight = self.epsilon_val
                 else:
                     sensor_weight = self.self_exploration_val **(-self.count_grid[x][y])
+                    
 
             weighted_array.append((sensors_item,sensor_weight))
         #For more space exploration, 
@@ -201,12 +209,14 @@ class Robot(object):
                 weighted_array.append(self.count_grid[x][y])
                 sensor_mapped.append(sensors_item)
             else:
-                return 1
-            #print ' ', sensors_array,' len ',len(weighted_array)
-
-        #For more space exploration, 
-        #print ' '
-        #print 'weighted_array ',weighted_array,' min val ',min(weighted_array),' index ',weighted_array.index(min(weighted_array)) ,' len ',len(sensor_mapped)
+                #Needed to be removed later
+                #print 'Reached in the dead inside array of length 0, sensors ',sensors_array,' at loc ',( x,y),' count '
+                #sys.exit()
+                #Needed to be removed later
+                #return 1
+                weighted_array.append(self.deadends_weight) #Avoid next deadends
+                sensor_mapped.append(sensors_item)
+                
         min_count = sensor_mapped[weighted_array.index(min(weighted_array))]
 
         return min_count
@@ -244,10 +254,10 @@ class Robot(object):
             #rand_index = random.choice(sensors_array)
 
             # Place for brain of exploration
-            rand_index = self.weighted_prob_exploration(sensors_array)
+            #rand_index = self.weighted_prob_exploration(sensors_array)
 
             #For counting explorator without wieghted probability
-            #rand_index = self.counting_exploration(sensors_array)
+            rand_index = self.counting_exploration(sensors_array)
 
             #print 'rand_index ',rand_index
             rotation = angle_val[rand_index]
@@ -527,6 +537,13 @@ class Robot(object):
         self.steps_count +=1
         
         return int(rotation), int( movement)
+        
+    #Method for making initial heuristics values without mapping
+    def initial_heuristics(self):
+        for x in range(0,self.no_of_cols/2):
+            for i in  range(x,self.no_of_cols-x):
+                for j in range(x,self.no_of_rows-x):
+                    self.init_heuristics[i][j] = (self.no_of_cols/2) - x -1
 
     #Main method for moving robot
     def next_move(self, sensors):
