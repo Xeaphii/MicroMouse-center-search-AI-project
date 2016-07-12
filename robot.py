@@ -59,7 +59,7 @@ class Robot(object):
         self.count_steps = 0
         self.size_of_goal= 2
         self.no_of_dim   = 2
-        self.rotate_cost = 2
+        self.rotate_cost = 1
         self.normal_cost = 1
         self.is_exploration_done = False
         self.is_changed_explorat = False
@@ -197,7 +197,7 @@ class Robot(object):
         for sensors_item in sensors_array:
             x,y = self.simulate_move(angle_val[sensors_item],1)
 
-            if self.deadend_grid[x][y] != 1:
+            if self.deadend_grid[x][y] == 0:
                 weighted_array.append(self.count_grid[x][y])
                 sensor_mapped.append(sensors_item)
             else:
