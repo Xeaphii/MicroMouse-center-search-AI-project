@@ -244,6 +244,14 @@ class Robot(object):
         min_count = sensor_mapped[weighted_array.index(min(weighted_array))]
 
         return min_count
+    
+    #Helper function for checking whether all space is explored or not
+    def all_space_explorere(self):
+        return self.is_all_space_explored() or self.count_steps >=900
+        
+    #Helper function for checking whether all space is explored or not
+    def goal_first_explorere(self):
+        return self.isGoal(self.location) or self.count_steps >=900
 
     #for robot exploration in the first run
     def robot_exploration(self,sensors):
@@ -300,8 +308,12 @@ class Robot(object):
 
         self.update_mapping(value) #Updates value for mapping
 
-        #print self.isGoal(self.location)
-        if self.is_all_space_explored() or self.count_steps >=900:
+        #print for all space exploration
+        #if self.all_space_explorere():
+        
+        # for goal first explorere
+        if self.goal_first_explorere():
+        
             print 'All Space explored, ready for optimization steps are ',self.count_steps
             
             #setting check for moving onto the second run
