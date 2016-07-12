@@ -189,6 +189,28 @@ class Robot(object):
         #For more space exploration, 
         return self.weighted_choice(weighted_array)
 
+
+    # Weighted explorator for count probability
+    def counting_exploration(self,sensors_array):
+        weighted_array = []
+        sensor_mapped  = []
+        for sensors_item in sensors_array:
+            x,y = self.simulate_move(angle_val[sensors_item],1)
+
+            if self.deadend_grid[x][y] != 1:
+                weighted_array.append(self.count_grid[x][y])
+                sensor_mapped.append(sensors_item)
+            else:
+                return 1
+            #print ' ', sensors_array,' len ',len(weighted_array)
+
+        #For more space exploration, 
+        print ' '
+        print 'weighted_array ',weighted_array,' min val ',min(weighted_array),' index ',weighted_array.index(min(weighted_array)) ,' len ',len(sensor_mapped)
+        min_count = sensor_mapped[weighted_array.index(min(weighted_array))]
+
+        return min_count
+
     #for robot exploration in the first run
     def robot_exploration(self,sensors):
 
@@ -222,9 +244,12 @@ class Robot(object):
             #rand_index = random.choice(sensors_array)
 
             # Place for brain of exploration
-            rand_index = self.weighted_prob_exploration(sensors_array)
+            #rand_index = self.weighted_prob_exploration(sensors_array)
 
+            #For counting explorator without wieghted probability
+            rand_index = self.counting_exploration(sensors_array)
 
+            #print 'rand_index ',rand_index
             rotation = angle_val[rand_index]
             movement = 1
 
