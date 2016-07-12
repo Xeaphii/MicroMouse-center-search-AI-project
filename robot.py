@@ -220,6 +220,30 @@ class Robot(object):
         min_count = sensor_mapped[weighted_array.index(min(weighted_array))]
 
         return min_count
+        
+        
+    # Weighted explorator for count probability
+    def counting_exploration_heuristic(self,sensors_array):
+        weighted_array = []
+        sensor_mapped  = []
+        for sensors_item in sensors_array:
+            x,y = self.simulate_move(angle_val[sensors_item],1)
+
+            if self.deadend_grid[x][y] == 0:
+                weighted_array.append(self.count_grid[x][y] + self.init_heuristics[x][y])
+                sensor_mapped.append(sensors_item)
+            else:
+                #Needed to be removed later
+                #print 'Reached in the dead inside array of length 0, sensors ',sensors_array,' at loc ',( x,y),' count '
+                #sys.exit()
+                #Needed to be removed later
+                #return 1
+                weighted_array.append(self.deadends_weight) #Avoid next deadends
+                sensor_mapped.append(sensors_item)
+                
+        min_count = sensor_mapped[weighted_array.index(min(weighted_array))]
+
+        return min_count
 
     #for robot exploration in the first run
     def robot_exploration(self,sensors):
@@ -257,7 +281,10 @@ class Robot(object):
             #rand_index = self.weighted_prob_exploration(sensors_array)
 
             #For counting explorator without wieghted probability
-            rand_index = self.counting_exploration(sensors_array)
+            #rand_index = self.counting_exploration(sensors_array)
+            
+            #For counting explorator without wieghted probability
+            rand_index = self.counting_exploration_heuristic(sensors_array)
 
             #print 'rand_index ',rand_index
             rotation = angle_val[rand_index]
@@ -543,7 +570,7 @@ class Robot(object):
         for x in range(0,self.no_of_cols/2):
             for i in  range(x,self.no_of_cols-x):
                 for j in range(x,self.no_of_rows-x):
-                    self.init_heuristics[i][j] = (self.no_of_cols/2) - x -1
+                    self.init_heuristics[i][j] = ((self.no_of_cols/2) - x -1)**0.5
 
     #Main method for moving robot
     def next_move(self, sensors):
