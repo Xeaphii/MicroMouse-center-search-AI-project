@@ -205,8 +205,8 @@ class Robot(object):
             #print ' ', sensors_array,' len ',len(weighted_array)
 
         #For more space exploration, 
-        print ' '
-        print 'weighted_array ',weighted_array,' min val ',min(weighted_array),' index ',weighted_array.index(min(weighted_array)) ,' len ',len(sensor_mapped)
+        #print ' '
+        #print 'weighted_array ',weighted_array,' min val ',min(weighted_array),' index ',weighted_array.index(min(weighted_array)) ,' len ',len(sensor_mapped)
         min_count = sensor_mapped[weighted_array.index(min(weighted_array))]
 
         return min_count
@@ -244,10 +244,10 @@ class Robot(object):
             #rand_index = random.choice(sensors_array)
 
             # Place for brain of exploration
-            #rand_index = self.weighted_prob_exploration(sensors_array)
+            rand_index = self.weighted_prob_exploration(sensors_array)
 
             #For counting explorator without wieghted probability
-            rand_index = self.counting_exploration(sensors_array)
+            #rand_index = self.counting_exploration(sensors_array)
 
             #print 'rand_index ',rand_index
             rotation = angle_val[rand_index]
@@ -433,7 +433,7 @@ class Robot(object):
                 x = next[2]
                 y = next[3]
                 location = (x,y)
-                g = next[0]
+                g2  = next[0]
                 
                 
                 if self.isGoal((x,y)):
@@ -460,7 +460,7 @@ class Robot(object):
                     #actions_list.append(forward_name[min_action_index])
                     actions_list.append(forward_name[min_action_index])
                     
-                    g2 = g 
+                     #g 
 
                     open.append([g2+min_action_value,g2, min_x2, min_y2])
                     closed[min_x2][min_y2] = 1
@@ -486,7 +486,7 @@ class Robot(object):
             #print 'Now performing a star search'
             action_grid,actions_list = self.a_star_search()
             
-            
+            #self.print_list(action_grid)
             #Defining path for robot
             route,steps = self.get_route(actions_list)
             self.route = route
@@ -494,7 +494,9 @@ class Robot(object):
             #setting is changed exploration function to false for not running these method again
             self.is_changed_explorat = False  
             print 'Total steps with multiple steps ', len(self.route)
-            
+            self.print_list(self.heuristics)
+            self.print_list(self.route)
+            sys.exit()
             
         
         if len(self.route)>1 and len(self.route) > self.steps_count:
