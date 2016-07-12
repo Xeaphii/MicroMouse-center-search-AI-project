@@ -363,7 +363,10 @@ class Robot(object):
 
     #For building heuristics function from mapped maze
     def build_heuristics(self):
-
+        
+        #Doing some initialization here
+        prev_action = -1
+        
         #For all of the currently opened maze positions
         stacked_positions = []
 
@@ -371,20 +374,35 @@ class Robot(object):
             for y in range(self.size_of_goal):
                 location = (self.no_of_rows/2+x-1, self.no_of_cols/2+y-1)
                 h_value = 0
-                stacked_positions.append((location,h_value))
+                stacked_positions.append((location,h_value,prev_action))
                 self.update_heuristics(location, h_value)
 
         while(len(stacked_positions) >0):
-            location , h_value = stacked_positions.pop(0)
+            
+                         #Set it to some value later
+            #if prev_action == -1:
+                
+            location , h_value,prev_action = stacked_positions.pop(0)
 
             allowed_actions_list = self.allowed_actions(location)
 
             for idx in allowed_actions_list:
+                
+                #Keeping trakc of robot new orientation
+                
+                #index_loc = dir_names.index(action_list[idx])
+                
                 updated_loc = [ location[i]+forward[dir_index_ar[idx]][i] for i in range(self.no_of_dim)]
                 
                 if self.heuristics[updated_loc[0]][updated_loc[1]] == self.def_heu_val:
-                    stacked_positions.append((updated_loc,h_value+1))
-                    self.update_heuristics(updated_loc, h_value+1)
+                
+                    movement = 1
+                    rotation = 0
+                    
+                    self.move(rotation, movement) 
+                    local_cost = 1 if prev_action == idx or prev_action == -1 else 2
+                    stacked_positions.append((updated_loc,h_value+local_cost,idx))
+                    self.update_heuristics(updated_loc, h_value+local_cost)
 
 
     #Cost method for returing cost of turn 
@@ -424,9 +442,9 @@ class Robot(object):
         while not found and not resign:
             
             #Needed to be removed later
-            if count > 6:
-                self.print_list(self.heuristics)
-                sys.exit()
+            #if count > 10:
+            #    self.print_list(self.heuristics)
+            #    sys.exit()
                 
             #Needed to be removed later   
                 
@@ -514,7 +532,7 @@ class Robot(object):
             #Needed to be removed later
             self.print_list(self.heuristics)
             self.print_list(self.route)
-            sys.exit()
+            #sys.exit()
             #Needed to be removed later
         
         if len(self.route)>1 and len(self.route) > self.steps_count:
