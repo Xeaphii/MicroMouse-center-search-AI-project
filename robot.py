@@ -9,7 +9,7 @@ forward = [[-1,  0], # go up
            [ 1,  0], # go down
            [ 0,  1]] # go right
 forward_name = ['up', 'right', 'down', 'left']
-forward_name = ['^', '>', 'v', '<']
+#forward_name = ['^', '>', 'v', '<']
 
 # action has 3 values: right turn, no turn, left turn
 action = [1, 0, -1]
@@ -576,8 +576,8 @@ class Robot(object):
             #print 'Now performing a star search'
             action_grid,actions_list = self.a_star_search()
             
-            self.print_list(action_grid)
-            sys.exit()
+            #self.print_list(action_grid)
+            #sys.exit()
             #Defining path for robot
             route,steps = self.get_route(actions_list)
             self.route = route
