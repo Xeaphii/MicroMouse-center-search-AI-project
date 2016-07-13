@@ -9,7 +9,7 @@ forward = [[-1,  0], # go up
            [ 1,  0], # go down
            [ 0,  1]] # go right
 forward_name = ['up', 'right', 'down', 'left']
-#forward_name = ['^', '>', 'v', '<']
+forward_name = ['^', '>', 'v', '<']
 
 # action has 3 values: right turn, no turn, left turn
 action = [1, 0, -1]
@@ -322,10 +322,10 @@ class Robot(object):
         self.update_mapping(value) #Updates value for mapping
 
         #print for all space exploration
-        if self.all_space_explorere():
+        #if self.all_space_explorere():
         
         # for goal first explorere
-        #if self.goal_first_explorere():
+        if self.goal_first_explorere():
         
             print 'All Space explored, ready for optimization steps are ',self.count_steps
             
@@ -575,15 +575,19 @@ class Robot(object):
             
             #building heuristics
             self.build_heuristics()
+            #self.print_list(self.heuristics)
+            #sys.exit()
             
             #print 'Now performing a star search'
             action_grid,actions_list = self.a_star_search()
             
-            #self.print_list(action_grid)
-            #sys.exit()
+            self.print_list(action_grid)
+            sys.exit()
             #Defining path for robot
             route,steps = self.get_route(actions_list)
             self.route = route
+            #self.print_list(self.route)
+            #sys.exit()
             
             #setting is changed exploration function to false for not running these method again
             self.is_changed_explorat = False  
