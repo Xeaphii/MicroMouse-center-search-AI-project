@@ -2,14 +2,16 @@ import numpy as np
 import time
 import sys
 from random import random
+#import random
 from bisect import bisect
+
 
 forward = [[-1,  0], # go up
            [ 0, -1], # go left
            [ 1,  0], # go down
            [ 0,  1]] # go right
 forward_name = ['up', 'right', 'down', 'left']
-forward_name = ['^', '>', 'v', '<']
+#forward_name = ['^', '>', 'v', '<']
 
 # action has 3 values: right turn, no turn, left turn
 action = [1, 0, -1]
@@ -198,6 +200,8 @@ class Robot(object):
             weighted_array.append((sensors_item,sensor_weight))
         #For more space exploration, 
         return self.weighted_choice(weighted_array)
+		
+
 
     # Weighted explorator for count probability
     def weighted_prob_exploration_heu(self,sensors_array):
@@ -302,10 +306,10 @@ class Robot(object):
             #rand_index = self.counting_exploration(sensors_array)
             
             #For counting explorator without wieghted probability
-            rand_index = self.counting_exploration_heuristic(sensors_array)
+            #rand_index = self.counting_exploration_heuristic(sensors_array)	#Most optimal and stable.
             
             #For counting explorator with wieghted probability and heuristics
-            #rand_index = self.weighted_prob_exploration_heu(sensors_array)            
+            rand_index = self.weighted_prob_exploration_heu(sensors_array)            
 
             #print 'rand_index ',rand_index
             rotation = angle_val[rand_index]
@@ -581,8 +585,8 @@ class Robot(object):
             #print 'Now performing a star search'
             action_grid,actions_list = self.a_star_search()
             
-            self.print_list(action_grid)
-            sys.exit()
+            #self.print_list(action_grid)
+            #sys.exit()
             #Defining path for robot
             route,steps = self.get_route(actions_list)
             self.route = route
