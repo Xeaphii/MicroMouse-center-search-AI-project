@@ -363,6 +363,9 @@ class Robot(object):
         
         return rotation, movement
     
+	
+	
+	
     #Method to get route from given action list
     def get_route(self,action_list):
         
